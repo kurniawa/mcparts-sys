@@ -1,0 +1,88 @@
+2025.06.03 - Selasa
+=====================================
+*) Instalasi inertia Vue baru. Edit file .env:
+
+APP_LOCALE=id
+APP_FALLBACK_LOCALE=id
+APP_FAKER_LOCALE=id_ID
+APP_TIMEZONE=Asia/Jakarta
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=u1608450_mcparts_sys
+DB_USERNAME=root
+DB_PASSWORD=
+
+*) Copy paste semua file migrasi, samakan kolom pada tabel-tabel default/awal seperti tabel users. Kolom-kolom nya tidak saya ubah namanya ke bahasa inggris, soalnya istilah-istilah nya masih ribet kalo diubah ke bahasa inggris.
+
+*) Mengaplikasikan dual database:
+app/config/database.php
+-----------------------
+'mysql' => [
+    'driver' => 'mysql',
+    'url' => env('DB_URL'),
+    'host' => env('DB_HOST', '127.0.0.1'),
+    'port' => env('DB_PORT', '3306'),
+    'database' => env('DB_DATABASE', 'laravel'),
+    'username' => env('DB_USERNAME', 'root'),
+    'password' => env('DB_PASSWORD', ''),
+    'unix_socket' => env('DB_SOCKET', ''),
+    'charset' => env('DB_CHARSET', 'utf8mb4'),
+    'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'),
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'strict' => true,
+    'engine' => null,
+    'options' => extension_loaded('pdo_mysql') ? array_filter([
+        PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+    ]) : [],
+],
+
+'mysql_old' => [
+    'driver' => 'mysql',
+    'url' => env('DB_OLD_URL'),
+    'host' => env('DB_OLD_HOST', '127.0.0.1'),
+    'port' => env('DB_OLD_PORT', '3306'),
+    'database' => env('DB_OLD_DATABASE', 'old_laravel'),
+    'username' => env('DB_OLD_USERNAME', 'root'),
+    'password' => env('DB_OLD_PASSWORD', ''),
+    'unix_socket' => env('DB_OLD_SOCKET', ''),
+    'charset' => env('DB_OLD_CHARSET', 'utf8mb4'),
+    'collation' => env('DB_OLD_COLLATION', 'utf8mb4_unicode_ci'),
+    'prefix' => '',
+    'prefix_indexes' => true,
+    'strict' => true,
+    'engine' => null,
+    'options' => extension_loaded('pdo_mysql') ? array_filter([
+        PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+    ]) : [],
+],
+---------------------------------------------
+
+*) Membuat Command untuk backup semua data pada database lama. Nantinya hasil backup akan digunakan untuk seeding data pada database yang baru
+terminal: php artisan make:command BackupOldDatabase
+
+*) Pada saat backup sekaligus mengubah semua kata yang masih memakai bahasa indonesia ke dalam bahasa inggris, dengan kaedah: untuk kata-kata kategori utama tetap di awal kata supaya rapi. Contoh price_total dan price_grandtotal.
+app/Console/Commands/BackupOldDatabase.php
+------------------------------------------
+} elseif ($table === 'jenis_perhiasans') {
+    $new_name = 'jewel_varieties';
+    $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
+        $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+        $item['tipe_perhiasan_id'] = $item['jewel_type_id']; // Buat kolom baru
+        $item['tipe_perhiasan'] = $item['jewel_type_name'];
+        $item['nama'] = $item['name'];
+
+        unset($item['tipe_perhiasan_id']); // Hapus kolom lama
+        unset($item['tipe_perhiasan']);
+        unset($item['nama']);
+        return $item;
+    });
+    
+} else {
+    $data = DB::connection('mysql_old')->table($table)->get();
+}
+File::put(storage_path("backup/$new_name.json"), $data->toJson());
+echo "Backup berhasil disimpan ke storage/backup/$new_name.json\n";
+--------------------------------------------------------------------
