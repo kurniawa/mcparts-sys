@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('expeditions', function (Blueprint $table) {
             $table->id();
             $table->string("type", 20)->nullable(); // pribadi, organisasi/badan/perusahaan
             $table->string('role', 20)->nullable(); // ["kreditur", "debitur"]
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string("company_name", 100)->nullable();
             $table->string("organization_name", 100)->nullable();
             $table->string("store_name", 100)->nullable();
-            $table->string("owner_name", 100)->nullable();;
+            $table->string("owner_name", 100)->nullable();
             $table->string("nickname", 10)->nullable();
             $table->enum("gender", ['male', 'female'])->nullable();
             $table->string("id_type", 20)->nullable();
@@ -51,6 +51,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customers');
+        Schema::dropIfExists('expeditions');
     }
 };

@@ -32,7 +32,11 @@ return new class extends Migration
             $table->string('account_type', 20)->nullable();
             $table->string('gender', 20)->nullable(); // pria atau wanita
             $table->string('profile_photo_path')->nullable();
-            $table->string('created_by', 20)->nullable()->default("self"); // username dari auth user yang membuat
+            $table->string('created_by', 50)->nullable();
+            $table->string('updated_by', 50)->nullable();
+            $table->timestamp('deleted_at')->nullable(); // Soft delete
+            $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
+            $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
 
             $table->rememberToken();
             $table->timestamps();

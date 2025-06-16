@@ -27,14 +27,18 @@ class BackupOldDatabase extends Command
      */
     public function handle()
     {
-        $tables = ['users', 'pelanggans', 'suppliers', 'bahans', 'bahan_hargas', 'ekspedisis', 'pelanggan_ekspedisis',
-        'supplier_alamats', 'supplier_kontaks', 'pelanggan_alamats', 'pelanggan_kontaks'
+        $tables = ['users', 'pelanggans', 'suppliers', 'ekspedisis',
+        'pelanggan_alamats', 'pelanggan_kontaks', 'supplier_alamats', 'supplier_kontaks', 'ekspedisi_alamats', 'ekspedisi_kontaks',
+        'bahans', 'bahan_hargas', 'pelanggan_ekspedisis',
         ];
 
         $addresses = [];
+        $contact_numbers = [];
+
         foreach ($tables as $table) {
             $data = collect();
             $new_name = $table;
+            $run_save_file = true;
             if ($table === 'users') {
                 $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
@@ -54,77 +58,138 @@ class BackupOldDatabase extends Command
                     unset($item['nama']); // Hapus kolom lama
                     return $item;
                 });
-            } elseif ($table === 'pelanggans' || $table === 'suppliers') {
-                $new_name = $table === 'pelanggans' ? 'customers' : 'suppliers';
+            } elseif ($table === 'pelanggans' || $table === 'suppliers' || $table === 'ekspedisis') {
+                $new_name = $table === 'pelanggans' ? 'customers' : ($table === 'suppliers' ? 'suppliers' : 'expeditions');
                 $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-                    $item['type'] = $item['tipe']; // Buat kolom baru
+                    $entity_type = $item['tipe'] ?? null;
+                    $item['type'] = $entity_type; // Buat kolom baru
                     $item['business_entity'] = $item['bentuk'];
-                    $item['company_name'] = $item['nama'];
+                    $item['name'] = $item['nama'];
 
-                    if ($item['reseller_id'] !== null) {
-                        $item['is_reseller'] = 'yes';
+                    if (isset($item['reseller_id'])) {
+                        if ($item['reseller_id'] !== null) {
+                            $item['is_reseller'] = 'yes';
+                        }
                     }
 
-                    unset($item['tipe']); // Hapus kolom lama
+                    // Hapus kolom lama
+                    if (isset($item['tipe'])) {unset($item['tipe']);}
                     unset($item['bentuk']);
                     unset($item['nama']);
-                    unset($item['gender']);
-                    unset($item['nik']);
-                    unset($item['sapaan']);
-                    unset($item['gelar']);
-                    unset($item['tanggal_lahir']);
-                    unset($item['kategori']);
-                    unset($item['keterangan']);
-                    unset($item['creator']);
-                    unset($item['updater']);
+                    if (isset($item['gender'])) {unset($item['gender']);}
+                    if (isset($item['nik'])) {unset($item['nik']);}
+                    if (isset($item['sapaan'])) {unset($item['sapaan']);}
+                    if (isset($item['gelar'])) {unset($item['gelar']);}
+                    if (isset($item['tanggal_lahir'])) {unset($item['tanggal_lahir']);}
+                    if (isset($item['kategori'])) {unset($item['kategori']);}
+                    if (isset($item['keterangan'])) {unset($item['keterangan']);}
+                    if (isset($item['creator'])) {unset($item['creator']);}
+                    if (isset($item['updater'])) {unset($item['updater']);}
                     return $item;
                 });
-            } elseif ($table === 'pelanggan_alamats' || $table === 'supplier_alamats') {
-                $owner_type = $table === 'pelanggan_alamats' ? 'customer' : 'supplier';
+            } elseif ($table === 'pelanggan_alamats' || $table === 'supplier_alamats' || $table === 'ekspedisi_alamats') {
+                $run_save_file = false;
+                $owner_type = $table === 'pelanggan_alamats' ? 'customer' : ($table === 'supplier_alamats' ? 'supplier' : 'expedition');
                 $datas = DB::connection('mysql_old')->table($table)->get();
                 foreach ($datas as $item) {
-                    $owner_id = $item->pelanggan_id ?? $item->supplier_id; // Ambil ID owner
-                    DB::connection('mysql_old')->table('alamats')
-                        ->where('owner_id', $owner_id)
-                        ->where('owner_type', $owner_type)
-                        ->get()->map(function ($item) use (&$addresses, $owner_type, $owner_id) {
-                            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-                            $item['owner_id'] = $owner_id;
-                            $item['owner_type'] = $owner_type;
-                            $item['owner_name'] = $item['nama'];
-                            $item['address_type'] = $item['tipe'];
-                            $item['address_status'] = $item['status'];
-                            $item['description'] = $item['keterangan'];
+                    $owner_id = $item->pelanggan_id ?? $item->supplier_id ?? $item->ekspedisi_id; // Ambil ID owner
+                    $entity_address_table = isset($item->pelanggan_id) ? 'pelanggan_alamats' : (isset($item->supplier_id) ? 'supplier_alamats' : 'ekspedisi_alamats');
+                    $entity_address_column = isset($item->pelanggan_id) ? 'pelanggan_id' : (isset($item->supplier_id) ? 'supplier_id' : 'ekspedisi_id');
+                    $entity_table = $table === 'pelanggan_alamats' ? 'pelanggans' : ($table === 'supplier_alamats' ? 'suppliers' : 'ekspedisis');
+                    $entity_addresses = DB::connection('mysql_old')->table($entity_address_table)
+                        ->where($entity_address_column, $owner_id)
+                        ->get();
 
-                            unset($item['pelanggan_id']); // Hapus kolom lama
-                            unset($item['supplier_id']);
-                            unset($item['nama']);
-                            unset($item['tipe']);
-                            unset($item['status']);
-                            unset($item['keterangan']);
-
-                            // Simpan alamat untuk digunakan nanti
-                            if (!empty($item)) {
-                                $addresses[] = $item;
-                            }
-                            
-                            return $item;
-                        });
+                    foreach ($entity_addresses as $entity_address) {
+                        DB::connection('mysql_old')->table('alamats')->where('id', $entity_address->alamat_id)
+                            ->get()->map(function ($item) use (&$addresses, $owner_type, $owner_id, $entity_address, $entity_table) {
+                                $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+                                $item['owner_id'] = $owner_id;
+                                $item['owner_type'] = $owner_type;
+                                $owner = DB::connection('mysql_old')->table($entity_table)
+                                    ->where('id', $owner_id)
+                                    ->first();
+                                $item['owner_name'] = $owner->nama;
+                                $item['address_type'] = 'office';
+                                $item['housing_complex'] = $item['komplek'];
+                                $item['street'] = $item['jalan'];
+                                $item['rural_village'] = $item['desa'];
+                                $item['urban_village'] = $item['kelurahan'];
+                                $item['district'] = $item['kecamatan'];
+                                $item['city'] = $item['kota'];
+                                $item['postal_code'] = $item['kodepos'];
+                                $item['regency'] = $item['kabupaten'];
+                                $item['province'] = $item['provinsi'];
+                                $item['country'] = $item['negara'];
+                                $item['long'] = str_replace('"', "'", $item['long']);
+                                $item['long'] = str_replace('\/', "-", $item['long']);
+    
+                                $address_order = 'primary';
+                                if ($entity_address->tipe === 'CADANGAN') {
+                                    $address_order = 'secondary';
+                                }
+                                $item['address_order'] = $address_order;
+    
+                                unset($item['jalan']);unset($item['komplek']);unset($item['desa']);unset($item['kelurahan']);
+                                unset($item['kecamatan']);unset($item['kota']);unset($item['kodepos']);
+                                unset($item['kabupaten']);unset($item['provinsi']);unset($item['pulau']);unset($item['negara']);
+                                unset($item['id']);
+    
+                                // Simpan alamat untuk digunakan nanti
+                                if (!empty($item)) {
+                                    // dd(json_encode($item));
+                                    $addresses[] = $item;
+                                }
+                                
+                                return $item;
+                            });
+                    }
+                    // dd($addresses);
                 }
-                # code...
-            } elseif ($table === 'ekspedisis') {
-                $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
+            } elseif ($table === 'pelanggan_kontaks' || $table === 'supplier_kontaks' || $table === 'ekspedisi_kontaks') {
+                $run_save_file = false;
+                $owner_type = $table === 'pelanggan_kontaks' ? 'customer' : ($table === 'supplier_kontaks' ? 'supplier' : 'expedition');
+                $owner_table = $table === 'pelanggan_kontaks' ? 'pelanggans' : ($table === 'supplier_kontaks' ? 'suppliers' : 'ekspedisis');
+                $datas = DB::connection('mysql_old')->table($table)->get()->map(function ($item) use (&$contact_numbers, $owner_type, $owner_table) {
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-                    $item['business_entity'] = $item['bentuk']; // Buat kolom baru
-                    $item['name'] = $item['nama']; 
+                    $owner_id = $item['pelanggan_id'] ?? $item['supplier_id'] ?? $item['ekspedisi_id']; // Ambil ID owner
+                    $item['owner_id'] = $owner_id;
+                    $item['owner_type'] = $owner_type;
 
-                    unset($item['bentuk']); // Hapus kolom lama
-                    unset($item['nama']);
+                    $owner = DB::connection('mysql_old')->table($owner_table)
+                        ->where('id', $owner_id)
+                        ->first();
+
+                    $item['owner_name'] = $owner->nama;
+                    $item['contact_type'] = $item['tipe'];
+
+                    $contact_order = 'primary';
+                    if ($item['is_aktual'] === 'no') {
+                        $contact_order = 'secondary';
+                    }
+                    $item['contact_order'] = $contact_order;
+                    $item['country_code'] = '+62';
+                    $item['area_code'] = $item['kodearea'];
+                    $item['number'] = $item['nomor'];
+
+                    if (isset($item['supplier_id'])) { unset($item['supplier_id']);}
+                    elseif (isset($item['pelanggan_id'])) { unset($item['pelanggan_id']);}
+                    elseif (isset($item['ekspedisi_id'])) { unset($item['ekspedisi_id']);}
+                    unset($item['tipe']);
+                    unset($item['is_aktual']);
+                    unset($item['kodearea']);
+                    unset($item['nomor']);
                     unset($item['keterangan']);
+                    unset($item['id']);
+                    unset($item['lokasi']);
+
+                    if (!empty($item)) {
+                        $contact_numbers[] = $item;
+                    }
+                    
                     return $item;
                 });
-                $new_name = 'expeditions';
             } elseif ($table === 'bahans') {
                 $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
@@ -152,19 +217,50 @@ class BackupOldDatabase extends Command
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
                     $item['customer_id'] = $item['pelanggan_id']; // Buat kolom baru
                     $item['expedition_id'] = $item['ekspedisi_id'];
-                    $item['type'] = $item['tipe'];
+
+                    $expedition_type = "direct";
+                    if (isset($item['is_transit']) && $item['is_transit'] === 'yes') {
+                        $expedition_type = 'transit';
+                    }
+                    $item['expedition_type'] = $expedition_type;
+
+                    $expedition_order = 'primary';
+                    if (isset($item['tipe']) && $item['tipe'] === 'CADANGAN') {
+                        $expedition_order = 'secondary';
+                    }
+                    $item['expedition_order'] = $expedition_order;
 
                     unset($item['pelanggan_id']); // Hapus kolom lama
                     unset($item['ekspedisi_id']);
                     unset($item['tipe']);
+                    unset($item['is_transit']);
                     return $item;
                 });
                 $new_name = 'customer_expeditions';
             } else {
                 $data = DB::connection('mysql_old')->table($table)->get();
             }
-            File::put(storage_path("backup/$new_name.json"), $data->toJson());
-            echo "Backup berhasil disimpan ke storage/backup/$new_name.json\n";
+
+            if ($run_save_file) {
+                File::put(storage_path("backup/$new_name.json"), $data->toJson());
+                echo "Backup berhasil disimpan ke storage/backup/$new_name.json\n";
+            }
+        }
+
+        // Table: addresses
+        if (!empty($addresses)) {
+            File::put(storage_path("backup/addresses.json"), json_encode($addresses));
+            echo "Backup berhasil disimpan ke storage/backup/addresses.json\n";
+        } else {
+            echo "Tidak ada alamat yang ditemukan untuk dibackup.\n";
+        }
+
+        // Table: contact_numbers
+        if (!empty($contact_numbers)) {
+            File::put(storage_path("backup/contact_numbers.json"), json_encode($contact_numbers));
+            echo "Backup berhasil disimpan ke storage/backup/contact_numbers.json\n";
+        } else {
+            echo "Tidak ada nomor kontak yang ditemukan untuk dibackup.\n";
         }
 
         // Table: product_types

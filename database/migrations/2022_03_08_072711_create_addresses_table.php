@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string("owner_type"); // user, customer, supplier, etc.
             $table->string("owner_name", 100)->nullable(); // Name of the person or entity associated with the address.
             $table->string("address_type", 20)->nullable(); // e.g., home, office, billing, shipping, etc.
-            $table->string("address_status", 20)->nullable(); // e.g., active, inactive, primary, secondary, etc.
+            $table->string("address_status", 20)->nullable(); // e.g., active, inactive, etc.
+            $table->string("address_order", 20)->nullable(); // Order of the address, e.g., 1 for primary, 2 for secondary, etc.
             $table->string("building_name", 100)->nullable();
             $table->string("floor", 10)->nullable();
             $table->string("housing_complex", 100)->nullable();
@@ -39,6 +40,11 @@ return new class extends Migration
             $table->string("short", 50)->nullable();
             $table->string("long")->nullable(); // yang di Jakarta/Tangerang ada yang tidak pakai keterangan alamat. Ini bisa diisi dengan nama perumahan atau nama ruko, dll.
             $table->string("description")->nullable(); // Additional description or notes about the contact number.
+            $table->string('created_by', 50)->nullable();
+            $table->string('updated_by', 50)->nullable();
+            $table->timestamp('deleted_at')->nullable(); // Soft delete
+            $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
+            $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
             $table->timestamps();
         });
     }

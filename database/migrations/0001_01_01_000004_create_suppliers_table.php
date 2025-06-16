@@ -16,10 +16,11 @@ return new class extends Migration
             $table->string("type", 20)->nullable(); // pribadi, organisasi/badan/perusahaan
             $table->string('role', 20)->nullable(); // ["kreditur", "debitur"]
             $table->string("business_entity", 10)->nullable(); // PT, CV, Yayasan, Sekolah, dll.
+            $table->string("name", 100);
             $table->string("company_name", 100)->nullable();
             $table->string("organization_name", 100)->nullable();
             $table->string("store_name", 100)->nullable();
-            $table->string("owner_name", 100);
+            $table->string("owner_name", 100)->nullable();
             $table->string("nickname", 10)->nullable();
             $table->enum("gender", ['male', 'female'])->nullable();
             $table->string("id_type", 20)->nullable();
@@ -33,6 +34,9 @@ return new class extends Migration
             $table->bigInteger("reseller_id")->nullable();
             $table->string('created_by', 50)->nullable();
             $table->string('updated_by', 50)->nullable();
+            $table->timestamp('deleted_at')->nullable(); // Soft delete
+            $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
+            $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
             $table->timestamps();
         });
     }
