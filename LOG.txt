@@ -1,3 +1,7 @@
+2025.06.19 - Kamis
+==================
+Masih di migrasi. Next: migrasi products, lalu coba untuk melakukan seeding ke database yang baru.
+
 2025.06.03 - Selasa
 =====================================
 *) Instalasi inertia Vue baru. Edit file .env:

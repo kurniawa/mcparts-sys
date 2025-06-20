@@ -16,10 +16,18 @@ return new class extends Migration
     {
         Schema::create('feature_prices', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('feature_id')->nullable()->constrained('features')->onDelete('set null');
             $table->string('feature_name', 50);
-            $table->foreignId('feature_id')->constrained('features')->onDelete('CASCADE');
             $table->decimal('price', 15, 2)->default(0.00);
-            $table->string('type', 20)->default('previous');
+            $table->string('price_type', 20)->nullable(); 
+            $table->string('price_category', 20)->nullable(); 
+            $table->string('price_order', 20)->nullable(); 
+
+            $table->string('created_by', 50)->nullable();
+            $table->string('updated_by', 50)->nullable();
+            $table->timestamp('deleted_at')->nullable(); // Soft delete
+            $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
+            $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
             $table->timestamps();
         });
     }

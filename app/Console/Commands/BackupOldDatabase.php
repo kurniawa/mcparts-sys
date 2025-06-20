@@ -29,7 +29,7 @@ class BackupOldDatabase extends Command
     {
         $tables = ['users', 'pelanggans', 'suppliers', 'ekspedisis',
         'pelanggan_alamats', 'pelanggan_kontaks', 'supplier_alamats', 'supplier_kontaks', 'ekspedisi_alamats', 'ekspedisi_kontaks',
-        'bahans', 'bahan_hargas', 'pelanggan_ekspedisis',
+        'bahans', 'bahan_hargas', 'pelanggan_ekspedisis'
         ];
 
         $addresses = [];
@@ -263,35 +263,35 @@ class BackupOldDatabase extends Command
             echo "Tidak ada nomor kontak yang ditemukan untuk dibackup.\n";
         }
 
-        // Table: product_types
-
-        $product_types = [
-            ["id" => 1, "name" => "Busa Stang", "slug" => "busa-stang", "parent_id" => null, "parent_slug" => null, "short_name" => "Busa Stang", "abbreviation" => "BS", "photo_path" => null, "photo_url" => null, "description" => "Busa yang digunakan untuk melapisi stang motor, memberikan kenyamanan saat berkendara."],
-            ["id" => 2, "name" => "Jok Assy", "slug" => "jok-assy", "parent_id" => null, "parent_slug" => null, "short_name" => "Jok Assy", "abbreviation" => "ASS", "photo_path" => null, "photo_url" => null, "description" => "Jok Assy adalah jok motor yang sudah lengkap dengan rangka dan busa, siap dipasang pada motor."],
-            ["id" => 3, "name" => "Kulit Jok Motor", "slug" => "kulit-jok-motor", "parent_id" => null, "parent_slug" => null, "short_name" => "Kulit Jok Motor", "abbreviation" => "KJM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor atau sarung jok motor merupakan produk utama pada usaha ini."],
-            ["id" => 4, "name" => "Rol", "slug" => "rol", "parent_id" => null, "parent_slug" => null, "short_name" => "Rol", "abbreviation" => "ROL", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang masih berbentuk gulungan/rol."],
-            ["id" => 5, "name" => "Rotan", "slug" => "rotan", "parent_id" => null, "parent_slug" => null, "short_name" => "Rotan", "abbreviation" => "ROT", "photo_path" => null, "photo_url" => null, "description" => "Bahan yang digunakan untuk membuat kulit jok motor dengan tipe tertentu yang menggunakan rotan ini sebagai list/rotan."],
-            ["id" => 6, "name" => "Stiker", "slug" => "stiker", "parent_id" => null, "parent_slug" => null, "short_name" => "Stiker", "abbreviation" => "STK", "photo_path" => null, "photo_url" => null, "description" => "Produk yang digunakan untuk menghias atau memberikan identitas pada motor."],
-            ["id" => 7, "name" => "Tank Pad", "slug" => "tank-pad", "parent_id" => null, "parent_slug" => null, "short_name" => "Tank Pad", "abbreviation" => "TP", "photo_path" => null, "photo_url" => null, "description" => "Pelindung tangki motor yang berfungsi untuk melindungi tangki dari goresan."],
+        // Table: category_trees
+        $category_trees = [
+            ["id" => 1, 'scope' => 'product_types', "name" => "Busa Stang", "slug" => "busa-stang", "parent_id" => null, "parent_slug" => null, "short_name" => "Busa Stang", "abbreviation" => "BS", "photo_path" => null, "photo_url" => null, "description" => "Busa yang digunakan untuk melapisi stang motor, memberikan kenyamanan saat berkendara."],
+            ["id" => 2, 'scope' => 'product_types', "name" => "Jok Assy", "slug" => "jok-assy", "parent_id" => null, "parent_slug" => null, "short_name" => "Jok Assy", "abbreviation" => "ASS", "photo_path" => null, "photo_url" => null, "description" => "Jok Assy adalah jok motor yang sudah lengkap dengan rangka dan busa, siap dipasang pada motor."],
+            ["id" => 3, 'scope' => 'product_types', "name" => "Kulit Jok Motor", "slug" => "kulit-jok-motor", "parent_id" => null, "parent_slug" => null, "short_name" => "Kulit Jok Motor", "abbreviation" => "KJM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor atau sarung jok motor merupakan produk utama pada usaha ini."],
+            ["id" => 4, 'scope' => 'product_types', "name" => "Rol", "slug" => "rol", "parent_id" => null, "parent_slug" => null, "short_name" => "Rol", "abbreviation" => "ROL", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang masih berbentuk gulungan/rol."],
+            ["id" => 5, 'scope' => 'product_types', "name" => "Rotan", "slug" => "rotan", "parent_id" => null, "parent_slug" => null, "short_name" => "Rotan", "abbreviation" => "ROT", "photo_path" => null, "photo_url" => null, "description" => "Bahan yang digunakan untuk membuat kulit jok motor dengan tipe tertentu yang menggunakan rotan ini sebagai list/rotan."],
+            ["id" => 6, 'scope' => 'product_types', "name" => "Stiker", "slug" => "stiker", "parent_id" => null, "parent_slug" => null, "short_name" => "Stiker", "abbreviation" => "STK", "photo_path" => null, "photo_url" => null, "description" => "Produk yang digunakan untuk menghias atau memberikan identitas pada motor."],
+            ["id" => 7, 'scope' => 'product_types', "name" => "Tank Pad", "slug" => "tank-pad", "parent_id" => null, "parent_slug" => null, "short_name" => "Tank Pad", "abbreviation" => "TP", "photo_path" => null, "photo_url" => null, "description" => "Pelindung tangki motor yang berfungsi untuk melindungi tangki dari goresan."],
 
             // Product Types for Kulit Jok Motor
-            ["id" => 8, "name" => "Japstyle", "slug" => "japstyle", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Japstyle", "abbreviation" => "JAP", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model yang terinspirasi dari gaya Jepang, yang terdiri dari baris-baris yang di press dengan busa tipis."],
-            ["id" => 9, "name" => "Kombinasi", "slug" => "kombinasi", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Kombinasi", "abbreviation" => "KOM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda yang harganya biasanya tergolong murah."],
-            ["id" => 10, "name" => "Motif", "slug" => "motif", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Motif", "abbreviation" => "MOT", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda dan terdiri dari jahitan tengah atau jahitan samping atau keduanya."],
-            ["id" => 11, "name" => "Standar", "slug" => "standar", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Standar", "abbreviation" => "STD", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang model dan ukurannya sudah disesuaikan dengan motor-motor tertentu."],
-            ["id" => 12, "name" => "Tato Sixpack", "slug" => "tato-sixpack", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "T. Sixpack", "abbreviation" => "T-SIX", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model sixpack besar yang di press."],
-            ["id" => 13, "name" => "Variasi", "slug" => "variasi", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Variasi", "abbreviation" => "VAR", "photo_path" => null, "photo_url" => null, "description" => "Semua variasi kulit jok motor bisa digolongkan sebagai variasi, namun saat ini yang tergolong variasi adalah Polos, Logo(LG.), Tato(T.)"],
+            ["id" => 8, 'scope' => 'product_types', "name" => "Japstyle", "slug" => "japstyle", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Japstyle", "abbreviation" => "JAP", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model yang terinspirasi dari gaya Jepang, yang terdiri dari baris-baris yang di press dengan busa tipis."],
+            ["id" => 9, 'scope' => 'product_types', "name" => "Kombinasi", "slug" => "kombinasi", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Kombinasi", "abbreviation" => "KOM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda yang harganya biasanya tergolong murah."],
+            ["id" => 10, 'scope' => 'product_types', "name" => "Motif", "slug" => "motif", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Motif", "abbreviation" => "MOT", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda dan terdiri dari jahitan tengah atau jahitan samping atau keduanya."],
+            ["id" => 11, 'scope' => 'product_types', "name" => "Standar", "slug" => "standar", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Standar", "abbreviation" => "STD", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang model dan ukurannya sudah disesuaikan dengan motor-motor tertentu."],
+            ["id" => 12, 'scope' => 'product_types', "name" => "Tato Sixpack", "slug" => "tato-sixpack", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "T. Sixpack", "abbreviation" => "T-SIX", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model sixpack besar yang di press."],
+            ["id" => 13, 'scope' => 'product_types', "name" => "Variasi", "slug" => "variasi", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Variasi", "abbreviation" => "VAR", "photo_path" => null, "photo_url" => null, "description" => "Semua variasi kulit jok motor bisa digolongkan sebagai variasi, namun saat ini yang tergolong variasi adalah Polos, Logo(LG.), Tato(T.)"],
         ];
 
         // 13 product types
 
-        $product_types_table = ['jokassies', 'rols', 'rotans', 'stikers', 'tankpads',
+        $product_types_table = ['busastangs', 'jokassies', 'rols', 'rotans', 'stikers', 'tankpads',
         'standars', 'motifs', 'kombinasis', 'japstyles', 'tsixpacks', 'variasis'];
 
+        $category_tree_id = 13;
         foreach ($product_types_table as $table) {
             $parent_id = null;
             $parent_slug = null;
-            if ($table === 'busastangs') {$parent_id = 1; $parent_slug = 'busa-stang';}
+            if ($table === 'busastangs') {$parent_id = 1;$parent_slug = 'busa-stang';}
             elseif ($table === 'jokassies') {$parent_id = 2;$parent_slug = 'jok-assy';}
             elseif ($table === 'rols') {$parent_id = 4;$parent_slug = 'rol';}
             elseif ($table === 'rotans') {$parent_id = 5;$parent_slug = 'rotan';}
@@ -304,8 +304,10 @@ class BackupOldDatabase extends Command
             elseif ($table === 'tsixpacks') {$parent_id = 12;$parent_slug = 'tato-sixpack';}
             elseif ($table === 'variasis') {$parent_id = 13;$parent_slug = 'variasi';}
 
-            $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) use ($parent_id, $parent_slug) {
+            $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) use ($parent_id, $parent_slug, &$category_tree_id) {
                 $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+                $item['id'] = $category_tree_id++; // Buat ID unik untuk setiap item
+                $item['scope'] = 'product_types'; // Scope untuk product types
                 $item['name'] = $item['nama']; // Buat kolom baru
                 $item['slug'] = str_replace(' ', '-', strtolower($item['nama'])); // Buat slug dari nama
                 $item['parent_id'] = $parent_id; // Parent ID
@@ -321,11 +323,42 @@ class BackupOldDatabase extends Command
                 return $item;
             });
 
-            $product_types = array_merge($product_types, $data->toArray());
+            $category_trees = array_merge($category_trees, $data->toArray());
         }
 
-        File::put(storage_path("backup/product_types.json"), json_encode($product_types));
-        echo "Backup berhasil disimpan ke storage/backup/product_types.json\n";
+        File::put(storage_path("backup/category_trees.json"), json_encode($category_trees));
+        echo "Backup berhasil disimpan ke storage/backup/category_trees.json\n";
+
+        // Table: category_prices
+        $product_type_price_tables = ['jokassy_hargas', 'rol_hargas', 'rotan_hargas', 'stiker_hargas', 'tankpad_hargas',
+        'standar_hargas', 'motif_hargas', 'kombinasi_hargas', 'japstyle_hargas', 'tsixpack_hargas', 'variasi_standar_hargas'];
+
+        foreach ($product_type_price_tables as $table) {
+            
+            $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item, $category_trees) use ($table) {
+                $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+
+                // Ambil data nama dari mysql_old
+                $name_old = str_replace('_hargas', '', $table);
+                $table_old = (substr($name_old, -1) === 'y') ? substr($name_old, 0, -1) . 'ies' : $name_old . 's';
+                $product_type = DB::connection('mysql_old')->table($table_old)
+                    ->where('id', $item[$name_old . '_id'])
+                    ->first();
+
+                // Cari ID terbaru dari category_trees
+                
+
+                $item['product_type_id'] = $item['produk_tipe_id']; // Buat kolom baru
+                $item['price'] = $item['harga'];
+
+                unset($item['produk_tipe_id']); // Hapus kolom lama
+                unset($item['harga']);
+                return $item;
+            });
+            $new_name = str_replace('_hargas', '_prices', $table);
+            File::put(storage_path("backup/$new_name.json"), $data->toJson());
+            echo "Backup berhasil disimpan ke storage/backup/$new_name.json\n";
+        }
 
         // Table: features
         $data = DB::connection('mysql_old')->table('specs')->get()->map(function ($item) {
@@ -349,6 +382,15 @@ class BackupOldDatabase extends Command
             return $item;
         });
 
+        $data = DB::connection('mysql_old')->table('varians')->get()->map(function ($item) {
+            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+            $item['category'] = 'drawing';
+            $item['name'] = $item['variasi_standar'];
+
+            unset($item['nama']); // Hapus kolom lama
+            return $item;
+        });
+
         $features = array_merge($features, $data->toArray());
         File::put(storage_path("backup/features.json"), json_encode($features));
         echo "Backup berhasil disimpan ke storage/backup/features.json\n";
@@ -365,5 +407,38 @@ class BackupOldDatabase extends Command
         });
         File::put(storage_path("backup/feature_prices.json"), $data->toJson());
         echo "Backup berhasil disimpan ke storage/backup/feature_prices.json\n";
+
+        // Table: products
+        $data = DB::connection('mysql_old')->table('produks')->get()->map(function ($item) {
+            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+            $item['type'] = $item['tipe']; // Buat kolom baru
+            $item['name'] = $item['nama'];
+            $item['invoice_name'] = $item['nama_nota'];
+            $item['packaging_type'] = $item['tipe_packing'];
+            $item['packaging_rule'] = $item['aturan_packing'];
+            $item['description'] = $item['keterangan'];
+
+            unset($item['tipe']); // Hapus kolom lama
+            unset($item['nama']);
+            unset($item['nama_nota']);
+            unset($item['tipe_packing']);
+            unset($item['aturan_packing']);
+            unset($item['keterangan']);
+            return $item;
+        });
+        File::put(storage_path("backup/products.json"), $data->toJson());
+        echo "Backup berhasil disimpan ke storage/backup/products.json\n";
+        // Table: product_prices
+        $data = DB::connection('mysql_old')->table('produk_hargas')->get()->map(function ($item) {
+            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+            $item['product_id'] = $item['produk_id']; // Buat kolom baru
+            $item['price'] = $item['harga'];
+
+            unset($item['produk_id']); // Hapus kolom lama
+            unset($item['harga']);
+            return $item;
+        });
+        File::put(storage_path("backup/product_prices.json"), $data->toJson());
+        echo "Backup berhasil disimpan ke storage/backup/product_prices.json\n";
     }
 }

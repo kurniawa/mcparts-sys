@@ -28,6 +28,12 @@ return new class extends Migration
             $table->string('stamp', 50)->nullable(); // merek yang tercantum, misalnya: "MC"
             $table->decimal('default_price', 15, 2)->default(0.00); // Harga per meter
             $table->string('description', 1000)->nullable();
+
+            $table->string('created_by', 50)->nullable();
+            $table->string('updated_by', 50)->nullable();
+            $table->timestamp('deleted_at')->nullable(); // Soft delete
+            $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
+            $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
             $table->timestamps();
         });
     }

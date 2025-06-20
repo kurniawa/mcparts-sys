@@ -2,26 +2,23 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('material_prices', function (Blueprint $table) {
+        Schema::create('category_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('material_id')->constrained()->onDelete('CASCADE');
-            $table->string('material_name');
+            $table->foreignId('category_id')->nullable()->constrained('category_trees')->onDelete('set null');
+            $table->string('category_slug', 50);
             $table->decimal('price', 15, 2)->default(0.00);
             $table->string('price_type', 20)->nullable(); 
             $table->string('price_category', 20)->nullable(); 
-            $table->string('price_order', 20)->nullable(); // primary, secondary, etc.
+            $table->string('price_order', 20)->nullable(); 
 
             $table->string('created_by', 50)->nullable();
             $table->string('updated_by', 50)->nullable();
@@ -34,11 +31,9 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        Schema::dropIfExists('material_prices');
+        Schema::dropIfExists('category_prices');
     }
 };

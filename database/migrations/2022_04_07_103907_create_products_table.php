@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,16 +13,22 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('features', function (Blueprint $table) {
+        /**
+         * Produks ini nanti nya akan berkaitan dengan table2 yang lain, meski tidak ada relasi yang dibuat pada table ini.
+         * Tergantung dari tipe nya, semisal SJ-Variasi, berarti nantinya dia akan berkaitan dengan bahan, variasi, ukuran dan jahit.
+         *
+         */
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('supplier_id')->nullable()->constrained()->onDelete('set null');
+            $table->string('supplier_name', 100)->nullable();
             $table->foreignId('category_id')->nullable();
             $table->string('category_slug', 50)->nullable();
-            $table->string('name', 50);
-            $table->string('spk_name', 50)->nullable();
-            $table->string('invoice_name', 50)->nullable();
-            $table->string('default_price', 50)->nullable();
-            $table->string('photo_path')->nullable(); // Path to the product type photo.
-            $table->string('photo_url')->nullable(); // URL to the product type photo.
+            $table->string('type', 50)->nullable();
+            $table->string('name');
+            $table->string('invoice_name');
+            $table->string('packaging_type', 20)->nullable();
+            $table->smallInteger('packaging_rule')->nullable();
             $table->string('description')->nullable();
 
             $table->string('created_by', 50)->nullable();
@@ -42,6 +47,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('features');
+        Schema::dropIfExists('products');
     }
 };

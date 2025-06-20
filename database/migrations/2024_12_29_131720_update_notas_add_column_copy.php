@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('supplier_alamats')) {
-            Schema::create('supplier_alamats', function (Blueprint $table) {
-                $table->id();
-                $table->timestamps();
-            });
-        }
+        Schema::table('notas', function (Blueprint $table) {
+            $table->boolean('copy')->nullable()->default(true);
+        });
     }
 
     /**
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('supplier_alamats');
+        Schema::table('notas', function (Blueprint $table) {
+            $table->dropColumn('copy');
+        });
     }
 };
