@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -44,6 +45,7 @@ class BackupOldDatabase extends Command
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
                     $item['fullname'] = $item['nama']; // Buat kolom baru
                     $item['role'] = strtolower($item['role']); // Ubah role menjadi huruf kecil
+                    $item['profile_photo_path'] = $item['profile_picture']; // Buat kolom baru
 
                     if ($item['role'] === 'developer') {
                         $item['clearance_level'] = 6;
@@ -56,6 +58,7 @@ class BackupOldDatabase extends Command
                     }
                     
                     unset($item['nama']); // Hapus kolom lama
+                    unset($item['profile_picture']);
                     return $item;
                 });
             } elseif ($table === 'pelanggans' || $table === 'suppliers' || $table === 'ekspedisis') {
@@ -74,20 +77,14 @@ class BackupOldDatabase extends Command
                     }
 
                     // Hapus kolom lama
-                    if (isset($item['tipe'])) {unset($item['tipe']);}
-                    unset($item['bentuk']);
-                    unset($item['nama']);
-                    if (isset($item['gender'])) {unset($item['gender']);}
-                    if (isset($item['nik'])) {unset($item['nik']);}
-                    if (isset($item['sapaan'])) {unset($item['sapaan']);}
-                    if (isset($item['gelar'])) {unset($item['gelar']);}
-                    if (isset($item['tanggal_lahir'])) {unset($item['tanggal_lahir']);}
-                    if (isset($item['kategori'])) {unset($item['kategori']);}
-                    if (isset($item['keterangan'])) {unset($item['keterangan']);}
-                    if (isset($item['creator'])) {unset($item['creator']);}
-                    if (isset($item['updater'])) {unset($item['updater']);}
+                    $item = Arr::except($item, [
+                        'tipe', 'bentuk', 'nama', 'gender', 'nik', 'sapaan',
+                        'gelar', 'tanggal_lahir', 'kategori', 'keterangan',
+                        'creator', 'updater', 'nama_pemilik'
+                    ]);
                     return $item;
                 });
+                // dd($data);
             } elseif ($table === 'pelanggan_alamats' || $table === 'supplier_alamats' || $table === 'ekspedisi_alamats') {
                 $run_save_file = false;
                 $owner_type = $table === 'pelanggan_alamats' ? 'customer' : ($table === 'supplier_alamats' ? 'supplier' : 'expedition');
@@ -130,11 +127,18 @@ class BackupOldDatabase extends Command
                                     $address_order = 'secondary';
                                 }
                                 $item['address_order'] = $address_order;
+
+                                // Hapus kolom lama
+                                $item = Arr::except($item, [
+                                    'jalan', 'komplek', 'desa', 'kelurahan',
+                                    'kecamatan', 'kota', 'kodepos', 'kabupaten',
+                                    'provinsi', 'pulau', 'negara', 'id',
+                                ]);
     
-                                unset($item['jalan']);unset($item['komplek']);unset($item['desa']);unset($item['kelurahan']);
-                                unset($item['kecamatan']);unset($item['kota']);unset($item['kodepos']);
-                                unset($item['kabupaten']);unset($item['provinsi']);unset($item['pulau']);unset($item['negara']);
-                                unset($item['id']);
+                                // unset($item['jalan']);unset($item['komplek']);unset($item['desa']);unset($item['kelurahan']);
+                                // unset($item['kecamatan']);unset($item['kota']);unset($item['kodepos']);
+                                // unset($item['kabupaten']);unset($item['provinsi']);unset($item['pulau']);unset($item['negara']);
+                                // unset($item['id']);
     
                                 // Simpan alamat untuk digunakan nanti
                                 if (!empty($item)) {
@@ -173,16 +177,21 @@ class BackupOldDatabase extends Command
                     $item['area_code'] = $item['kodearea'];
                     $item['number'] = $item['nomor'];
 
-                    if (isset($item['supplier_id'])) { unset($item['supplier_id']);}
-                    elseif (isset($item['pelanggan_id'])) { unset($item['pelanggan_id']);}
-                    elseif (isset($item['ekspedisi_id'])) { unset($item['ekspedisi_id']);}
-                    unset($item['tipe']);
-                    unset($item['is_aktual']);
-                    unset($item['kodearea']);
-                    unset($item['nomor']);
-                    unset($item['keterangan']);
-                    unset($item['id']);
-                    unset($item['lokasi']);
+                    // Hapus kolom lama
+                    $item = Arr::except($item, [
+                        'supplier_id', 'pelanggan_id', 'ekspedisi_id', 'tipe', 'is_aktual', 'kodearea',
+                        'nomor', 'keterangan', 'id', 'lokasi',
+                    ]);
+                    // if (isset($item['supplier_id'])) { unset($item['supplier_id']);}
+                    // elseif (isset($item['pelanggan_id'])) { unset($item['pelanggan_id']);}
+                    // elseif (isset($item['ekspedisi_id'])) { unset($item['ekspedisi_id']);}
+                    // unset($item['tipe']);
+                    // unset($item['is_aktual']);
+                    // unset($item['kodearea']);
+                    // unset($item['nomor']);
+                    // unset($item['keterangan']);
+                    // unset($item['id']);
+                    // unset($item['lokasi']);
 
                     if (!empty($item)) {
                         $contact_numbers[] = $item;
@@ -193,7 +202,8 @@ class BackupOldDatabase extends Command
             } elseif ($table === 'bahans') {
                 $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-                    $item['name'] = $item['nama']; // Buat kolom baru
+                    $item['name'] = str_replace('/', '..', $item['nama']); // Buat kolom baru
+                    $item['slug'] = str_replace(' ', '_', strtolower($item['name']));
                     $item['description'] = $item['keterangan'];
 
                     unset($item['nama']); // Hapus kolom lama
@@ -205,6 +215,12 @@ class BackupOldDatabase extends Command
                 $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) {
                     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
                     $item['material_id'] = $item['bahan_id']; // Buat kolom baru
+                    // Mengambil nama bahan dari tabel materials
+                    $material = DB::connection('mysql_old')->table('bahans')
+                        ->where('id', $item['bahan_id'])
+                        ->first();
+                    $material_name = str_replace('/', '..', $material->nama);
+                    $item['material_slug'] = str_replace(' ', '_', strtolower($material_name));
                     $item['price'] = $item['harga'];
 
                     unset($item['bahan_id']); // Hapus kolom lama
@@ -265,21 +281,21 @@ class BackupOldDatabase extends Command
 
         // Table: category_trees
         $category_trees = [
-            ["id" => 1, 'scope' => 'product_types', "name" => "Busa Stang", "slug" => "busa-stang", "parent_id" => null, "parent_slug" => null, "short_name" => "Busa Stang", "abbreviation" => "BS", "photo_path" => null, "photo_url" => null, "description" => "Busa yang digunakan untuk melapisi stang motor, memberikan kenyamanan saat berkendara."],
-            ["id" => 2, 'scope' => 'product_types', "name" => "Jok Assy", "slug" => "jok-assy", "parent_id" => null, "parent_slug" => null, "short_name" => "Jok Assy", "abbreviation" => "ASS", "photo_path" => null, "photo_url" => null, "description" => "Jok Assy adalah jok motor yang sudah lengkap dengan rangka dan busa, siap dipasang pada motor."],
-            ["id" => 3, 'scope' => 'product_types', "name" => "Kulit Jok Motor", "slug" => "kulit-jok-motor", "parent_id" => null, "parent_slug" => null, "short_name" => "Kulit Jok Motor", "abbreviation" => "KJM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor atau sarung jok motor merupakan produk utama pada usaha ini."],
+            ["id" => 1, 'scope' => 'product_types', "name" => "Busa Stang", "slug" => "busa_stang", "parent_id" => null, "parent_slug" => null, "short_name" => "Busa Stang", "abbreviation" => "BS", "photo_path" => null, "photo_url" => null, "description" => "Busa yang digunakan untuk melapisi stang motor, memberikan kenyamanan saat berkendara."],
+            ["id" => 2, 'scope' => 'product_types', "name" => "Jok Assy", "slug" => "jok_assy", "parent_id" => null, "parent_slug" => null, "short_name" => "Jok Assy", "abbreviation" => "ASS", "photo_path" => null, "photo_url" => null, "description" => "Jok Assy adalah jok motor yang sudah lengkap dengan rangka dan busa, siap dipasang pada motor."],
+            ["id" => 3, 'scope' => 'product_types', "name" => "Kulit Jok Motor", "slug" => "kulit_jok_motor", "parent_id" => null, "parent_slug" => null, "short_name" => "Kulit Jok Motor", "abbreviation" => "KJM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor atau sarung jok motor merupakan produk utama pada usaha ini."],
             ["id" => 4, 'scope' => 'product_types', "name" => "Rol", "slug" => "rol", "parent_id" => null, "parent_slug" => null, "short_name" => "Rol", "abbreviation" => "ROL", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang masih berbentuk gulungan/rol."],
             ["id" => 5, 'scope' => 'product_types', "name" => "Rotan", "slug" => "rotan", "parent_id" => null, "parent_slug" => null, "short_name" => "Rotan", "abbreviation" => "ROT", "photo_path" => null, "photo_url" => null, "description" => "Bahan yang digunakan untuk membuat kulit jok motor dengan tipe tertentu yang menggunakan rotan ini sebagai list/rotan."],
             ["id" => 6, 'scope' => 'product_types', "name" => "Stiker", "slug" => "stiker", "parent_id" => null, "parent_slug" => null, "short_name" => "Stiker", "abbreviation" => "STK", "photo_path" => null, "photo_url" => null, "description" => "Produk yang digunakan untuk menghias atau memberikan identitas pada motor."],
             ["id" => 7, 'scope' => 'product_types', "name" => "Tank Pad", "slug" => "tank-pad", "parent_id" => null, "parent_slug" => null, "short_name" => "Tank Pad", "abbreviation" => "TP", "photo_path" => null, "photo_url" => null, "description" => "Pelindung tangki motor yang berfungsi untuk melindungi tangki dari goresan."],
 
             // Product Types for Kulit Jok Motor
-            ["id" => 8, 'scope' => 'product_types', "name" => "Japstyle", "slug" => "japstyle", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Japstyle", "abbreviation" => "JAP", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model yang terinspirasi dari gaya Jepang, yang terdiri dari baris-baris yang di press dengan busa tipis."],
-            ["id" => 9, 'scope' => 'product_types', "name" => "Kombinasi", "slug" => "kombinasi", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Kombinasi", "abbreviation" => "KOM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda yang harganya biasanya tergolong murah."],
-            ["id" => 10, 'scope' => 'product_types', "name" => "Motif", "slug" => "motif", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Motif", "abbreviation" => "MOT", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda dan terdiri dari jahitan tengah atau jahitan samping atau keduanya."],
-            ["id" => 11, 'scope' => 'product_types', "name" => "Standar", "slug" => "standar", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Standar", "abbreviation" => "STD", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang model dan ukurannya sudah disesuaikan dengan motor-motor tertentu."],
-            ["id" => 12, 'scope' => 'product_types', "name" => "Tato Sixpack", "slug" => "tato-sixpack", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "T. Sixpack", "abbreviation" => "T-SIX", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model sixpack besar yang di press."],
-            ["id" => 13, 'scope' => 'product_types', "name" => "Variasi", "slug" => "variasi", "parent_id" => 3, "parent_slug" => "kulit-jok-motor", "short_name" => "Variasi", "abbreviation" => "VAR", "photo_path" => null, "photo_url" => null, "description" => "Semua variasi kulit jok motor bisa digolongkan sebagai variasi, namun saat ini yang tergolong variasi adalah Polos, Logo(LG.), Tato(T.)"],
+            ["id" => 8, 'scope' => 'product_types', "name" => "Japstyle", "slug" => "japstyle", "parent_id" => 3, "parent_slug" => "kulit_jok_motor", "short_name" => "Japstyle", "abbreviation" => "JAP", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model yang terinspirasi dari gaya Jepang, yang terdiri dari baris-baris yang di press dengan busa tipis."],
+            ["id" => 9, 'scope' => 'product_types', "name" => "Kombinasi", "slug" => "kombinasi", "parent_id" => 3, "parent_slug" => "kulit_jok_motor", "short_name" => "Kombinasi", "abbreviation" => "KOM", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda yang harganya biasanya tergolong murah."],
+            ["id" => 10, 'scope' => 'product_types', "name" => "Motif", "slug" => "motif", "parent_id" => 3, "parent_slug" => "kulit_jok_motor", "short_name" => "Motif", "abbreviation" => "MOT", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan kombinasi 2 bahan atau 2 warna yang berbeda dan terdiri dari jahitan tengah atau jahitan samping atau keduanya."],
+            ["id" => 11, 'scope' => 'product_types', "name" => "Standar", "slug" => "standar", "parent_id" => 3, "parent_slug" => "kulit_jok_motor", "short_name" => "Standar", "abbreviation" => "STD", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor yang model dan ukurannya sudah disesuaikan dengan motor-motor tertentu."],
+            ["id" => 12, 'scope' => 'product_types', "name" => "Tato Sixpack", "slug" => "tato_sixpack", "parent_id" => 3, "parent_slug" => "kulit_jok_motor", "short_name" => "T. Sixpack", "abbreviation" => "T-SIX", "photo_path" => null, "photo_url" => null, "description" => "Kulit jok motor dengan model sixpack besar yang di press."],
+            ["id" => 13, 'scope' => 'product_types', "name" => "Variasi", "slug" => "variasi", "parent_id" => 3, "parent_slug" => "kulit_jok_motor", "short_name" => "Variasi", "abbreviation" => "VAR", "photo_path" => null, "photo_url" => null, "description" => "Semua variasi kulit jok motor bisa digolongkan sebagai variasi, namun saat ini yang tergolong variasi adalah Polos, Logo(LG.), Tato(T.)"],
         ];
 
         // 13 product types
@@ -291,25 +307,25 @@ class BackupOldDatabase extends Command
         foreach ($product_types_table as $table) {
             $parent_id = null;
             $parent_slug = null;
-            if ($table === 'busastangs') {$parent_id = 1;$parent_slug = 'busa-stang';}
-            elseif ($table === 'jokassies') {$parent_id = 2;$parent_slug = 'jok-assy';}
+            if ($table === 'busastangs') {$parent_id = 1;$parent_slug = 'busa_stang';}
+            elseif ($table === 'jokassies') {$parent_id = 2;$parent_slug = 'jok_assy';}
             elseif ($table === 'rols') {$parent_id = 4;$parent_slug = 'rol';}
             elseif ($table === 'rotans') {$parent_id = 5;$parent_slug = 'rotan';}
             elseif ($table === 'stikers') {$parent_id = 6;$parent_slug = 'stiker';}
-            elseif ($table === 'tankpads') {$parent_id = 7;$parent_slug = 'tank-pad';}
+            elseif ($table === 'tankpads') {$parent_id = 7;$parent_slug = 'tank_pad';}
             elseif ($table === 'japstyles') {$parent_id = 8;$parent_slug = 'japstyle';}
             elseif ($table === 'kombinasis') {$parent_id = 9;$parent_slug = 'kombinasi';}
             elseif ($table === 'motifs') {$parent_id = 10;$parent_slug = 'motif';}
             elseif ($table === 'standars') {$parent_id = 11;$parent_slug = 'standar';}
-            elseif ($table === 'tsixpacks') {$parent_id = 12;$parent_slug = 'tato-sixpack';}
+            elseif ($table === 'tsixpacks') {$parent_id = 12;$parent_slug = 'tato_sixpack';}
             elseif ($table === 'variasis') {$parent_id = 13;$parent_slug = 'variasi';}
 
             $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) use ($parent_id, $parent_slug, &$category_tree_id) {
                 $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-                $item['id'] = $category_tree_id++; // Buat ID unik untuk setiap item
+                $item['id'] = ++$category_tree_id; // Buat ID unik untuk setiap item
                 $item['scope'] = 'product_types'; // Scope untuk product types
                 $item['name'] = $item['nama']; // Buat kolom baru
-                $item['slug'] = str_replace(' ', '-', strtolower($item['nama'])); // Buat slug dari nama
+                $item['slug'] = $parent_slug . "-" . str_replace(' ', '_', strtolower($item['nama']));
                 $item['parent_id'] = $parent_id; // Parent ID
                 $item['parent_slug'] = $parent_slug; // Parent slug
                 $item['short_name'] = $item['nama']; // Short name sama dengan nama
@@ -318,8 +334,10 @@ class BackupOldDatabase extends Command
                 $item['photo_url'] = null; // Tidak ada photo_url
                 $item['description'] = $item['keterangan'];
 
-                unset($item['nama']); // Hapus kolom lama
-                unset($item['keterangan']);
+                // Hapus kolom lama
+                $item = Arr::except($item, [
+                    'nama', 'keterangan', 'harga_dasar', 'created_at', 'updated_at'
+                ]);
                 return $item;
             });
 
@@ -330,83 +348,101 @@ class BackupOldDatabase extends Command
         echo "Backup berhasil disimpan ke storage/backup/category_trees.json\n";
 
         // Table: category_prices
+        $category_prices = [];
         $product_type_price_tables = ['jokassy_hargas', 'rol_hargas', 'rotan_hargas', 'stiker_hargas', 'tankpad_hargas',
-        'standar_hargas', 'motif_hargas', 'kombinasi_hargas', 'japstyle_hargas', 'tsixpack_hargas', 'variasi_standar_hargas'];
+        'standar_variasis', 'motif_hargas', 'kombinasi_hargas', 'japstyle_hargas', 'tsixpack_hargas'];
 
         foreach ($product_type_price_tables as $table) {
             
-            $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item, $category_trees) use ($table) {
+            $data = DB::connection('mysql_old')->table($table)->get()->map(function ($item) use ($table, $category_trees) {
                 $item = json_decode(json_encode($item), true); // Ubah object menjadi array
 
                 // Ambil data nama dari mysql_old
                 $name_old = str_replace('_hargas', '', $table);
+                if ($table === 'standar_variasis') {
+                    $name_old = 'standar';
+                }
                 $table_old = (substr($name_old, -1) === 'y') ? substr($name_old, 0, -1) . 'ies' : $name_old . 's';
                 $product_type = DB::connection('mysql_old')->table($table_old)
                     ->where('id', $item[$name_old . '_id'])
                     ->first();
+                $name_to_find = $product_type->nama;
 
                 // Cari ID terbaru dari category_trees
+                $result = array_filter($category_trees, function ($item) use ($name_to_find) {
+                    return $item['name'] === $name_to_find;
+                });
+                $found_item = reset($result); // Ambil item pertama yang ditemukan
                 
 
-                $item['product_type_id'] = $item['produk_tipe_id']; // Buat kolom baru
+                $item['category_id'] = $found_item['id']; // Buat kolom baru
+                $item['category_slug'] = $found_item['slug']; // Ambil slug dari category_trees
                 $item['price'] = $item['harga'];
 
-                unset($item['produk_tipe_id']); // Hapus kolom lama
-                unset($item['harga']);
+                // Hapus kolom lama
+                $item = Arr::except($item, [
+                    $name_old . '_id', 'harga', 'id', 'created_at', 'updated_at',
+                    'bahan_id', 'grade_bahan', 'jahit_kepala', 'warna_sayap', 'press',
+                    'alas', 'jahit_samping'
+                ]);
+
                 return $item;
             });
-            $new_name = str_replace('_hargas', '_prices', $table);
-            File::put(storage_path("backup/$new_name.json"), $data->toJson());
-            echo "Backup berhasil disimpan ke storage/backup/$new_name.json\n";
+            $category_prices = array_merge($category_prices, $data->toArray());
         }
 
-        // Table: features
-        $data = DB::connection('mysql_old')->table('specs')->get()->map(function ($item) {
-            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-            $item['category'] = $item['kategori'];
-            $item['name'] = $item['nama'];
-            $item['invoice_name'] = $item['nama_nota'];
+        if (count($category_prices) > 0) {
+            File::put(storage_path("backup/category_prices.json"), json_encode($category_prices));
+            echo "Backup berhasil disimpan ke storage/backup/category_prices.json\n";
+        }
 
-            unset($item['nama']); // Hapus kolom lama
-            return $item;
-        });
+        // // Table: features
+        // $data = DB::connection('mysql_old')->table('specs')->get()->map(function ($item) {
+        //     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+        //     $item['category'] = $item['kategori'];
+        //     $item['name'] = $item['nama'];
+        //     $item['invoice_name'] = $item['nama_nota'];
 
-        $features = $data->toArray();
+        //     unset($item['nama']); // Hapus kolom lama
+        //     return $item;
+        // });
 
-        $data = DB::connection('mysql_old')->table('variasistandar_hargas')->get()->map(function ($item) {
-            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-            $item['category'] = 'feature-sj-variasi';
-            $item['name'] = $item['variasi_standar'];
+        // $features = $data->toArray();
 
-            unset($item['nama']); // Hapus kolom lama
-            return $item;
-        });
+        // $data = DB::connection('mysql_old')->table('variasistandar_hargas')->get()->map(function ($item) {
+        //     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+        //     $item['category'] = 'feature-sj-variasi';
+        //     $item['name'] = $item['variasi_standar'];
 
-        $data = DB::connection('mysql_old')->table('varians')->get()->map(function ($item) {
-            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-            $item['category'] = 'drawing';
-            $item['name'] = $item['variasi_standar'];
+        //     unset($item['nama']); // Hapus kolom lama
+        //     return $item;
+        // });
 
-            unset($item['nama']); // Hapus kolom lama
-            return $item;
-        });
+        // $data = DB::connection('mysql_old')->table('varians')->get()->map(function ($item) {
+        //     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+        //     $item['category'] = 'drawing';
+        //     $item['name'] = $item['variasi_standar'];
 
-        $features = array_merge($features, $data->toArray());
-        File::put(storage_path("backup/features.json"), json_encode($features));
-        echo "Backup berhasil disimpan ke storage/backup/features.json\n";
+        //     unset($item['nama']); // Hapus kolom lama
+        //     return $item;
+        // });
 
-        // Table: feature_prices
-        $data = DB::connection('mysql_old')->table('variasistandar_hargas')->get()->map(function ($item) {
-            $item = json_decode(json_encode($item), true); // Ubah object menjadi array
-            $item['feature_id'] = $item['id']; // Buat kolom baru
-            $item['price'] = $item['harga'];
+        // $features = array_merge($features, $data->toArray());
+        // File::put(storage_path("backup/features.json"), json_encode($features));
+        // echo "Backup berhasil disimpan ke storage/backup/features.json\n";
 
-            unset($item['id']); // Hapus kolom lama
-            unset($item['harga']);
-            return $item;
-        });
-        File::put(storage_path("backup/feature_prices.json"), $data->toJson());
-        echo "Backup berhasil disimpan ke storage/backup/feature_prices.json\n";
+        // // Table: feature_prices
+        // $data = DB::connection('mysql_old')->table('variasistandar_hargas')->get()->map(function ($item) {
+        //     $item = json_decode(json_encode($item), true); // Ubah object menjadi array
+        //     $item['feature_id'] = $item['id']; // Buat kolom baru
+        //     $item['price'] = $item['harga'];
+
+        //     unset($item['id']); // Hapus kolom lama
+        //     unset($item['harga']);
+        //     return $item;
+        // });
+        // File::put(storage_path("backup/feature_prices.json"), $data->toJson());
+        // echo "Backup berhasil disimpan ke storage/backup/feature_prices.json\n";
 
         // Table: products
         $data = DB::connection('mysql_old')->table('produks')->get()->map(function ($item) {

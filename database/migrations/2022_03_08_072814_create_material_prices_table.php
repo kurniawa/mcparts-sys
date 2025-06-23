@@ -17,11 +17,11 @@ return new class extends Migration
         Schema::create('material_prices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('material_id')->constrained()->onDelete('CASCADE');
-            $table->string('material_name');
+            $table->string('material_slug');
             $table->decimal('price', 15, 2)->default(0.00);
-            $table->string('price_type', 20)->nullable(); 
-            $table->string('price_category', 20)->nullable(); 
-            $table->string('price_order', 20)->nullable(); // primary, secondary, etc.
+            $table->string('price_type', 50)->nullable(); 
+            $table->string('price_category', 50)->nullable(); 
+            $table->string('price_order', 50)->nullable(); // primary, secondary, etc.
 
             $table->string('created_by', 50)->nullable();
             $table->string('updated_by', 50)->nullable();

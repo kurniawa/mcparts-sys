@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('suppliers', function (Blueprint $table) {
             $table->id();
-            $table->string("type", 20)->nullable(); // pribadi, organisasi/badan/perusahaan
-            $table->string('role', 20)->nullable(); // ["kreditur", "debitur"]
-            $table->string("business_entity", 10)->nullable(); // PT, CV, Yayasan, Sekolah, dll.
+            $table->string("type", 50)->nullable(); // pribadi, organisasi/badan/perusahaan
+            $table->string('role', 50)->nullable(); // ["kreditur", "debitur"]
+            $table->string("business_entity", 50)->nullable(); // PT, CV, Yayasan, Sekolah, dll.
             $table->string("name", 100);
             $table->string("company_name", 100)->nullable();
             $table->string("organization_name", 100)->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string("id_type", 20)->nullable();
             $table->string("id_number", 50)->nullable();
             $table->string("alias", 100)->nullable();
-            $table->string("title", 20)->nullable();
+            $table->string("title", 50)->nullable();
             $table->string("initial", 10)->nullable();
             $table->date("birthday")->nullable();
             $table->string("description")->nullable();

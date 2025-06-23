@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('firstname', 50)->nullable();
             $table->string('lastname', 50)->nullable();
-            $table->string('fullname', 100)->nullable();
+            $table->string('fullname')->nullable();
             $table->string('id_type', 20)->nullable(); // KTP, SIM, Passport, dll
             $table->string('id_number')->nullable()->unique();
             $table->string('contact_type')->nullable(); // WA, SMS, Email, dll
             $table->string('contact_number')->nullable()->unique();
             $table->string('username', 50)->unique();
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 

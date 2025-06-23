@@ -1,5 +1,10 @@
 <?php
 
+namespace App\Helpers;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
+
 class SeedingHelper
 {
     /**

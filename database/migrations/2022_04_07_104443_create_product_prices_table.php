@@ -29,10 +29,10 @@ return new class extends Migration
             $table->decimal('customer_price', 15, 2)->nullable(); // Harga khusus untuk customer tertentu.
             $table->smallinteger('discount_percentage')->nullable();
             $table->decimal('discount_price', 15, 2)->nullable();
-            $table->string('price_type', 20)->nullable(); // e.g., 'retail', 'wholesale', 'reseller', etc.
-            $table->string('price_status', 20)->default('active'); // e.g., 'active', 'inactive', 'archived'
-            $table->string('price_category', 20)->nullable(); // e.g., 'default', 'new', 'old', etc. Untuk menandai kategori harga.
-            $table->string('price_order', 20)->nullable(); // Order of the price, e.g., '1' for primary, '2' for secondary, etc.
+            $table->string('price_type', 50)->nullable(); // e.g., 'retail', 'wholesale', 'reseller', etc.
+            $table->string('price_status', 50)->default('active'); // e.g., 'active', 'inactive', 'archived'
+            $table->string('price_category', 50)->nullable(); // e.g., 'default', 'new', 'old', etc. Untuk menandai kategori harga.
+            $table->string('price_order', 50)->nullable(); // Order of the price, e.g., '1' for primary, '2' for secondary, etc.
             
             $table->string('created_by', 50)->nullable();
             $table->string('updated_by', 50)->nullable();

@@ -15,41 +15,41 @@ class FeatureSeeder extends Seeder
     public function run(): void
     {
         $feature_categories = [
-            ['id' => 1, 'name' => 'variasi', 'parent_id' => null, 'parent_name' => null],
-            ['id' => 2, 'name' => 'general', 'parent_id' => null, 'parent_name' => null],
-            ['id' => 3, 'name' => 'drawing', 'parent_id' => null, 'parent_name' => null],
+            ['id' => 1, 'name' => 'variasi', 'slug' => 'feature_type-variasi', 'parent_id' => null, 'parent_slug' => null],
+            ['id' => 2, 'name' => 'general', 'parent_id' => null, 'parent_slug' => null],
+            ['id' => 3, 'name' => 'drawing', 'parent_id' => null, 'parent_slug' => null],
             // variasi
-            ['name' => 'grade_bahan', 'parent_id' => 1, 'parent_name' => 'variasi'],
-            ['name' => 'ukuran', 'parent_id' => 1, 'parent_name' => 'variasi'],
-            ['name' => 'jahit', 'parent_id' => 1, 'parent_name' => 'variasi'],
-            ['name' => 'alas', 'parent_id' => 1, 'parent_name' => 'variasi'],
-            ['name' => 'busa', 'parent_id' => 1, 'parent_name' => 'variasi'],
-            ['name' => 'sayap', 'parent_id' => 1, 'parent_name' => 'variasi'],
-            ['name' => 'list', 'parent_id' => 1, 'parent_name' => 'variasi'],
+            ['name' => 'grade_bahan', 'parent_id' => 1, 'parent_slug' => 'variasi'],
+            ['name' => 'ukuran', 'parent_id' => 1, 'parent_slug' => 'variasi'],
+            ['name' => 'jahit', 'parent_id' => 1, 'parent_slug' => 'variasi'],
+            ['name' => 'alas', 'slug' => 'feature_type-variasi-alas', 'parent_id' => 1, 'parent_slug' => 'variasi'],
+            ['name' => 'busa', 'parent_id' => 1, 'parent_slug' => 'variasi'],
+            ['name' => 'sayap', 'parent_id' => 1, 'parent_slug' => 'variasi'],
+            ['name' => 'list', 'slug' => 'feature_type-variasi-list', 'parent_id' => 1, 'parent_slug' => 'variasi'],
             // general
-            ['name' => 'jht.Kepala', 'parent_id' => 2, 'parent_name' => 'general'],
-            ['name' => 'jht.Samping', 'parent_id' => 2, 'parent_name' => 'general'],
-            ['name' => 'PRESS', 'parent_id' => 2, 'parent_name' => 'general'],
-            ['name' => 'Alas', 'parent_id' => 2, 'parent_name' => 'general'],
-            ['name' => 'Busa', 'parent_id' => 2, 'parent_name' => 'general'],
+            ['name' => 'jht.Kepala', 'parent_id' => 2, 'parent_slug' => 'general'],
+            ['name' => 'jht.Samping', 'parent_id' => 2, 'parent_slug' => 'general'],
+            ['name' => 'PRESS', 'parent_id' => 2, 'parent_slug' => 'general'],
+            ['name' => 'Alas', 'slug' => 'feature_type-general-alas', 'parent_id' => 2, 'parent_slug' => 'general'],
+            ['name' => 'Busa', 'slug' => 'feature_type-general-busa', 'parent_id' => 2, 'parent_slug' => 'general'],
             // drawing
-            ['name' => 'honda', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'yamaha', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'neutral', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'multiple', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'anime', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'cartoon', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'animal', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'tulang', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'tribal', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'mica', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'event', 'parent_id' => 3, 'parent_name' => 'drawing'],
-            ['name' => 'list',   // this is a duplicate of the list above
+            ['name' => 'honda', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'yamaha', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'neutral', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'multiple', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'anime', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'cartoon', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'animal', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'tulang', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'tribal', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'mica', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'event', 'parent_id' => 3, 'parent_slug' => 'drawing'],
+            ['name' => 'list', 'slug' => 'feature_type-drawing-list',   // this is a duplicate of the list above
                 // but it is used for kawahara
                 // so it is not a duplicate
-                'parent_id' => 3, 'parent_name' => 'drawing'
+                'parent_id' => 3, 'parent_slug' => 'drawing'
             ],
-            ['name' => 'mix', 'parent_id' => 3, 'parent_name' => 'drawing'],
+            ['name' => 'mix', 'parent_id' => 3, 'parent_slug' => 'drawing'],
         ];
         $features = [
             // grade bahan
@@ -100,7 +100,7 @@ class FeatureSeeder extends Seeder
             ['category' => 'jahit', 'name' => 'NMAX (Promo)', 'spk_name' => 'jht.NMAX (Promo)', 'invoice_name' => 'jht.NMAX (Promo)'],
             
             // alas
-            ['category' => 'alas', 'name' => 'Alas', 'spk_name' => '', 'invoice_name' => 'Alas'],
+            ['category' => 'alas', 'name' => 'Alas', 'slug' => 'feature-alas', 'spk_name' => '', 'invoice_name' => 'Alas'],
             
             // busa
             ['category' => 'busa', 'name' => 'Busa', 'spk_name' => '', 'invoice_name' => 'Busa'],
@@ -221,12 +221,17 @@ class FeatureSeeder extends Seeder
 
         foreach ($feature_categories as $category) {
             $scope = 'feature_types';
+            $slug = str_replace(' ', '-', strtolower($category['name']));
+            if (isset($category['slug'])) {
+                $slug = $category['slug'];
+            }
+
             CategoryTree::create([
                 'scope' => $scope,
                 'name' => $category['name'],
-                'slug' => str_replace(' ', '-', strtolower($category['name'])),
+                'slug' => $slug,
                 'parent_id' => $category['parent_id'],
-                'parent_slug' => $category['parent_name'] ? str_replace(' ', '-', strtolower($category['parent_name'])) : null,
+                'parent_slug' => $category['parent_slug'] ? str_replace(' ', '-', strtolower($category['parent_slug'])) : null,
                 'short_name' => $category['name'],
             ]);
         }

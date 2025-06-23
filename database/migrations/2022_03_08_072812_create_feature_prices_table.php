@@ -19,9 +19,9 @@ return new class extends Migration
             $table->foreignId('feature_id')->nullable()->constrained('features')->onDelete('set null');
             $table->string('feature_name', 50);
             $table->decimal('price', 15, 2)->default(0.00);
-            $table->string('price_type', 20)->nullable(); 
-            $table->string('price_category', 20)->nullable(); 
-            $table->string('price_order', 20)->nullable(); 
+            $table->string('price_type', 50)->nullable(); 
+            $table->string('price_category', 50)->nullable(); 
+            $table->string('price_order', 50)->nullable(); 
 
             $table->string('created_by', 50)->nullable();
             $table->string('updated_by', 50)->nullable();

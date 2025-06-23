@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('category_trees', function (Blueprint $table) {
             $table->id();
-            $table->string('scope', 50); // product, feature, etc.
-            $table->string('name', 50); // Kulit Jok Motor, Tank Pad, Busa Stang, dll.
-            $table->string('slug', 50)->unique(); // kulit-jok-motor, tank-pad, busa-stang, dll.
+            $table->string('scope', 100); // product, feature, etc.
+            $table->string('name'); // Kulit Jok Motor, Tank Pad, Busa Stang, dll.
+            $table->string('slug')->unique(); // kulit-jok-motor, tank-pad, busa-stang, dll.
             $table->foreignId('parent_id')->nullable();
-            $table->string('parent_slug', 50)->nullable();
+            $table->string('parent_slug')->nullable();
             $table->string('short_name', 50); 
             $table->string('abbreviation', 10)->nullable();
             $table->string('photo_path')->nullable(); // Path to the product type photo.
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('updated_by', 50)->nullable();
             $table->timestamp('deleted_at')->nullable(); // Soft delete
             $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
-            $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
+            $table->string('deleted_reason')->nullable(); // Reason for deletion, if applicable
             $table->timestamps();
         });
     }

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\SeedingHelper;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use SeedingHelper;
 
 class DatabaseSeeder extends Seeder
 {
@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
         // ]);
         foreach (['users', 'customers', 'suppliers', 'expeditions',
         'addresses', 'contact_numbers', 'customer_expeditions',
-        'materials', 'material_prices', 'features', 'feature_prices'] 
+        'category_trees', 'category_prices', 'materials', 'material_prices'] 
         as $table) {
             SeedingHelper::seedTableFromJSON($table, $this->command);
         }
         $this->call([
-            ProductTypeSeeder::class,
+            FeatureSeeder::class,
         ]);
     }
 }
