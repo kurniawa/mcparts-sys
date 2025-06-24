@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string("province", 50)->nullable();
             $table->string("country", 50)->nullable();
             $table->string("short", 50)->nullable();
-            $table->string("long")->nullable(); // yang di Jakarta/Tangerang ada yang tidak pakai keterangan alamat. Ini bisa diisi dengan nama perumahan atau nama ruko, dll.
+            $table->string("full")->nullable(); // yang di Jakarta/Tangerang ada yang tidak pakai keterangan alamat. Ini bisa diisi dengan nama perumahan atau nama ruko, dll.
             $table->string("description")->nullable(); // Additional description or notes about the contact number.
             $table->string('created_by', 50)->nullable();
             $table->string('updated_by', 50)->nullable();

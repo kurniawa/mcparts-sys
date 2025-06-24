@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('material_prices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('material_id')->constrained()->onDelete('CASCADE');
+            $table->foreignId('material_id')->nullable()->constrained()->onDelete('set null');
             $table->string('material_slug');
             $table->decimal('price', 15, 2)->default(0.00);
             $table->string('price_type', 50)->nullable(); 

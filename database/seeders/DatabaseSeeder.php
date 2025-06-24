@@ -29,5 +29,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             FeatureSeeder::class,
         ]);
+        foreach (['products', 'product_prices'] 
+        as $table) {
+            SeedingHelper::seedTableFromJSON($table, $this->command);
+        }
     }
 }
