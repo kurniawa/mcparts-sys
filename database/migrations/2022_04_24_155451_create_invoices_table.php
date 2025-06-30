@@ -20,8 +20,8 @@ return new class extends Migration
                 $table->string('invoice_number', 20)->nullable();
                 // Data Customer
                 $table->foreignId('customer_id')->nullable()->constrained()->onDelete('SET NULL');
-                $table->foreignId('address_id')->nullable()->constrained()->onDelete('SET NULL');
-                $table->foreignId('contact_number')->nullable()->constrained()->onDelete('SET NULL');
+                $table->foreignId('customer_address_id')->nullable()->constrained('addresses')->onDelete('SET NULL');
+                $table->foreignId('customer_contact_number_id')->nullable()->constrained('contact_numbers')->onDelete('SET NULL');
                 $table->string('customer_name',100)->nullable();
                 $table->string('customer_full_address')->nullable();
                 $table->string('customer_short_address')->nullable();
@@ -36,8 +36,8 @@ return new class extends Migration
                 $table->string('reseller_contact_number')->nullable();
     
                 $table->mediumInteger('total_amount')->nullable();
-                $table->bigInteger('total_price')->nullable();
-                $table->bigInteger('remaining_payment');
+                $table->decimal('total_price', 15, 2)->nullable();
+                $table->decimal('remaining_payment', 15, 2);
                 $table->string('description')->nullable();
                 $table->string('payment_status', 20)->nullable();  // e.g., 'unpaid', 'paid', 'partial', 'overdue'
 

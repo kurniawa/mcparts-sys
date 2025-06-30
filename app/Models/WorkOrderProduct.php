@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class WorkOrderProduct extends Model
 {
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     /**
      * Get the work order that owns the product.
