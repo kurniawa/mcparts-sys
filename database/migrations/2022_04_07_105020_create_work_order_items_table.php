@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('work_order_products', function (Blueprint $table) {
+        Schema::create('work_order_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('wo_id')->constrained('work_orders')->onDelete('CASCADE')->onUpdate('CASCADE');
             $table->foreignId('product_id')->nullable()->constrained()->onDelete('SET NULL');
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->smallInteger('amount_on_delivery_note')->nullable();
             $table->decimal('basic_price', 15, 2)->nullable(); // Harga dasar produk, bisa diambil dari tabel product_prices
             $table->decimal('actual_price', 15, 2)->nullable();
-            $table->smallinteger('discount_percentage')->nullable();
+            $table->smallinteger('discount_value')->nullable();
             $table->decimal('discounted_price', 15, 2)->nullable();
             $table->string('price_type', 50)->nullable(); // e.g. "standar-price", "discounted-price", "customer-price".
             $table->foreignId('product_price_id')->nullable()->constrained('product_prices')->onDelete('SET NULL');
@@ -57,6 +57,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('work_order_products');
+        Schema::dropIfExists('work_order_items');
     }
 };

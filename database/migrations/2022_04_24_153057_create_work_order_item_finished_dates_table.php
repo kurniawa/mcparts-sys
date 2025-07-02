@@ -14,10 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('work_order_product_finished_dates', function (Blueprint $table) {
+        Schema::create('work_order_item_finished_dates', function (Blueprint $table) {
             $table->id();
             $table->foreignId('wo_id')->constrained('work_orders')->onDelete('CASCADE');
-            $table->foreignId('wo_product_id')->nullable()->constrained('work_order_products')->onDelete('set null');
+            $table->foreignId('wo_item_id')->nullable()->constrained('work_order_items')->onDelete('set null');
             $table->smallInteger('amount')->nullable();
             $table->smallInteger('tahapan_selesai')->nullable();
 
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('work_order_product_finished_dates');
+        Schema::dropIfExists('work_order_item_finished_dates');
     }
 };

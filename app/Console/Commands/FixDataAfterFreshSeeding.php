@@ -4,10 +4,12 @@ namespace App\Console\Commands;
 
 use App\Models\Address;
 use App\Models\ContactNumber;
+use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\WorkOrder;
-use App\Models\WorkOrderProduct;
+use App\Models\WorkOrderInvoice;
+use App\Models\WorkOrderItem;
 use DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -89,19 +91,28 @@ class FixDataAfterFreshSeeding extends Command
             }
         });
 
-        // work_order_products
+        // work_order_items
         DB::connection('mysql_old')->table('spk_produks')->orderBy('id')->chunk(500, function ($spk_produks) {
-            Log::info("Chunk ditemukan dengan jumlah: " . count($spk_produks));
+            // Log::info("Chunk ditemukan dengan jumlah: " . count($spk_produks));
             foreach ($spk_produks as $spk_produk) {
+                $product_name = null;
                 $product = Product::find($spk_produk->produk_id);
                 if (!$product) {
                     Log::warning("Produk ID {$spk_produk->produk_id} tidak ditemukan.");
-                    return;
+                } else {
+                    $product_name = $product->name;
+                }
+                // cek apakah work order benar-benar ada
+                $wo_id = $spk_produk->spk_id;
+                $work_order = WorkOrder::find($spk_produk->spk_id);
+                if (!$work_order) {
+                    Log::warning("[WARNING] Tidak diinput Work Order Item. Work Order ID {$spk_produk->spk_id} tidak ditemukan untuk SPK Produk ID {$spk_produk->id}.");
+                    continue; // Skip this product if the work order does not exist
                 }
                 try {
-                    WorkOrderProduct::create([
+                    WorkOrderItem::create([
                         'id' => $spk_produk->id,
-                        'wo_id' => $spk_produk->spk_id,
+                        'wo_id' => $wo_id,
                         'product_id' => $spk_produk->produk_id,
                         'product_name' => $product->name,
                         'description' => $spk_produk->keterangan,
@@ -117,14 +128,14 @@ class FixDataAfterFreshSeeding extends Command
                         'updated_at' => $spk_produk->updated_at,
                     ]);
                 } catch (\Exception $e) {
-                    Log::error("Gagal migrasi SPK ID {$spk_produk->id}: " . $e->getMessage());
+                    Log::error("Gagal migrasi SPK_PRODUK ID {$spk_produk->id}: " . $e->getMessage());
                 }
             }
         });
 
-        // notas
+        // invoices
         DB::connection('mysql_old')->table('notas')->orderBy('id')->chunk(500, function ($notas) {
-            Log::info("Chunk ditemukan dengan jumlah: " . count($notas));
+            // Log::info("Chunk ditemukan dengan jumlah: " . count($notas));
             foreach ($notas as $nota) {
                 // Contact Numbers
                 $customer_contact_number_id = $nota->kontak_id;
@@ -140,7 +151,8 @@ class FixDataAfterFreshSeeding extends Command
                         if ($contact_number) {
                             $customer_contact_number_id = $contact_number->id;
                         } else {
-                            Log::warning("Nomor kontak tidak ditemukan untuk " . $nota->pelanggan_nama . " dengan nomor: " . $customer_contact_number);
+                            Log::warning("[WARNING] Nomor kontak tidak ditemukan untuk customer: " . $nota->pelanggan_nama . " dengan nomor: " . $customer_contact_number);
+                            $customer_contact_number_id = null;
                         }
                     }
                     if (isset($nota_cust_kontak['kodearea']) && $nota_cust_kontak['kodearea']) {
@@ -160,11 +172,13 @@ class FixDataAfterFreshSeeding extends Command
                             ->where('owner_name', $nota->reseller_nama)
                             ->where('number', $nota_reseller_kontak['nomor'])
                             ->first();
-                        if (!$contact_number) {
+                        if ($contact_number) {
                             $reseller_contact_number_id = $contact_number->id;
+                        } else {
+                            Log::warning("[WARNING] Nomor kontak tidak ditemukan untuk reseller: " . $nota->reseller_nama . " dengan nomor: " . $reseller_contact_number);
+                            $reseller_contact_number_id = null;
                         }
                     }
-
                     if (isset($nota_reseller_kontak['kodearea']) && $nota_reseller_kontak['kodearea']) {
                         $reseller_contact_number = $nota_reseller_kontak['kodearea'] . '-' . $reseller_contact_number;
                     }
@@ -201,7 +215,7 @@ class FixDataAfterFreshSeeding extends Command
                         'invoice_number' => $nota->no_nota,
                         'customer_id' => $nota->pelanggan_id,
                         'customer_address_id' => $customer_address_id,
-                        'cusotmer_contact_number_id' => $customer_contact_number_id,
+                        'customer_contact_number_id' => $customer_contact_number_id,
                         'customer_name' => $nota->pelanggan_nama,
                         'customer_full_address' => $customer_full_address,
                         'customer_short_address' => $customer_short_address,
@@ -231,7 +245,72 @@ class FixDataAfterFreshSeeding extends Command
                         'updated_at' => $nota->updated_at,
                     ]);
                 } catch (\Exception $e) {
-                    Log::error("Gagal migrasi SPK ID {$nota->id}: " . $e->getMessage());
+                    Log::error("Gagal migrasi INVOICE ID {$nota->id}: " . $e->getMessage());
+                }
+            }
+        });
+
+        // Work Order Invoices
+        DB::connection('mysql_old')->table('spk_notas')->orderBy('id')->chunk(500, function ($spk_notas) {
+            foreach ($spk_notas as $spk_nota) {
+                $work_order = WorkOrder::find($spk_nota->spk_id);
+                if (!$work_order) {
+                    Log::warning("[WARNING] Tidak diinput - Work Order Invoices. Work Order ID {$spk_nota->spk_id} tidak ditemukan untuk SPK Nota ID {$spk_nota->id}.");
+                    continue; // Skip this invoice if the work order does not exist
+                }
+                try {
+                    WorkOrderInvoice::create([
+                        'id' => $spk_nota->id,
+                        'wo_id' => $spk_nota->spk_id,
+                        'invoice_id' => $spk_nota->nota_id,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("Gagal migrasi WORK_ORDER_INVOICE ID {$spk_nota->id}: " . $e->getMessage());
+                }
+            }
+        });
+        
+        
+        // Work Order Item Invoices
+        DB::connection('mysql_old')->table('spk_produk_notas')->orderBy('id')->chunk(500, function ($spk_produk_notas) {
+            foreach ($spk_produk_notas as $spk_produk_nota) {
+                $work_order = WorkOrder::find($spk_produk_nota->spk_id);
+                if (!$work_order) {
+                    Log::warning("[WARNING] Tidak diinput - Work Order Item Invoices. Work Order ID {$spk_produk_nota->spk_id} tidak ditemukan untuk SPK Produk Nota ID {$spk_produk_nota->id}.");
+                    continue; // Skip this product if the work order does not exist
+                }
+                $customer_id = null;
+                $customer_name = null;
+                if ($spk_produk_nota->pelanggan_id) {
+                    $pelanggan = DB::connection('mysql_old')->table('pelanggans')->where('id', $spk_produk_nota->pelanggan_id)->first();
+                    if ($pelanggan) {
+                        $customer = Customer::where('customer_name', $pelanggan->nama)->first();
+                        if ($customer) {
+                            $customer_id = $customer->id;
+                            $customer_name = $customer->name;
+                        }
+                    }
+                }
+                try {
+                    DB::table('work_order_item_invoices')->insert([
+                        'id' => $spk_produk_nota->id,
+                        'wo_id' => $spk_produk_nota->spk_id,
+                        'product_id' => $spk_produk_nota->produk_id,
+                        'work_order_item_id' => $spk_produk_nota->spk_produk_id,
+                        'invoice_id' => $spk_produk_nota->nota_id,
+                        'customer_id' => $customer_id,
+                        'customer_name' => $customer_name,
+                        'amount' => $spk_produk_nota->jumlah,
+                        'product_price_id' => $spk_produk_nota->harga_id,
+                        'product_name' => $spk_produk_nota->nama_produk,
+                        'product_invoice_name' => $spk_produk_nota->nama_nota,
+                        'unit_price' => $spk_produk_nota->harga_satuan,
+                        'total_price' => $spk_produk_nota->harga_total,
+                        'created_at' => $spk_produk_nota->created_at,
+                        'updated_at' => $spk_produk_nota->updated_at,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error("Gagal migrasi WORK_ORDER_ITEM_INVOICE ID {$spk_produk_nota->id}: " . $e->getMessage());
                 }
             }
         });

@@ -37,7 +37,7 @@ return new class extends Migration
     
                 $table->mediumInteger('total_amount')->nullable();
                 $table->decimal('total_price', 15, 2)->nullable();
-                $table->decimal('remaining_payment', 15, 2);
+                $table->decimal('remaining_payment', 15, 2)->nullable();
                 $table->string('description')->nullable();
                 $table->string('payment_status', 20)->nullable();  // e.g., 'unpaid', 'paid', 'partial', 'overdue'
 

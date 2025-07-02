@@ -26,9 +26,9 @@ return new class extends Migration
             $table->string('customer_name', 100)->nullable();
             $table->string('reseller_name', 100)->nullable();
             $table->decimal('basic_price', 15, 2);
-            $table->decimal('customer_price', 15, 2)->nullable(); // Harga khusus untuk customer tertentu.
-            $table->smallinteger('discount_percentage')->nullable();
-            $table->decimal('discount_price', 15, 2)->nullable();
+            // $table->decimal('customer_price', 15, 2)->nullable(); // Harga khusus untuk customer tertentu.
+            $table->smallinteger('discount_value')->nullable(); // in percentage
+            $table->decimal('final_price', 15, 2)->nullable();
             $table->string('price_type', 50)->nullable(); // e.g., 'retail', 'wholesale', 'reseller', etc.
             $table->string('price_status', 50)->nullable(); // e.g., 'active', 'inactive', 'archived'
             $table->string('price_category', 50)->nullable(); // e.g., 'default', 'new', 'old', etc. Untuk menandai kategori harga.

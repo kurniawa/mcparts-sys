@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('spk_notas', function (Blueprint $table) {
+        Schema::create('work_order_invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('spk_id')->nullable()->constrained()->onDelete('CASCADE');
-            $table->foreignId('nota_id')->nullable()->constrained()->onDelete('CASCADE');
+            $table->foreignId('wo_id')->nullable()->constrained('work_orders')->onDelete('CASCADE');
+            $table->foreignId('invoice_id')->nullable()->constrained()->onDelete('CASCADE');
             $table->timestamps();
         });
     }
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('spk_notas');
+        Schema::dropIfExists('work_order_invoices');
     }
 };
