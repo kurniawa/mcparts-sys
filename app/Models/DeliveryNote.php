@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class WorkOrderInvoice extends Model
+class DeliveryNote extends Model
 {
-    //
+    protected $guarded = [];
 }

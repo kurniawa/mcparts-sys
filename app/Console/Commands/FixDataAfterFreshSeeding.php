@@ -5,10 +5,12 @@ namespace App\Console\Commands;
 use App\Models\Address;
 use App\Models\ContactNumber;
 use App\Models\Customer;
+use App\Models\DeliveryNote;
+use App\Models\DeliveryNoteExpedition;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\WorkOrder;
-use App\Models\WorkOrderInvoice;
+use App\Models\WorkOrderInvoiceDeliveryNote;
 use App\Models\WorkOrderItem;
 use DB;
 use Illuminate\Console\Command;
@@ -250,7 +252,44 @@ class FixDataAfterFreshSeeding extends Command
             }
         });
 
-        // Work Order Invoices
+        /**
+         * Migrasi data delivery_notes pada database baru dari data srjalans pada database lama
+         */
+        // Ambil semua data srjalans dari database lama
+        DB::connection('mysql_old')->table('srjalans')->orderBy('id')->chunk(500, function ($srjalans) {
+            foreach ($srjalans as $srjalan) {
+                DeliveryNote::create([
+                    'id' => $srjalan->id,
+                    'delivery_note_number' => $srjalan->no_srjalan,
+                    'customer_id' => $srjalan->pelanggan_id,
+                    'expedition_id' => $srjalan->ekspedisi_id,
+                    'expedition_transit_id' => $srjalan->ekspedisi_transit_id,
+                    'reseller_id' => $srjalan->reseller_id,
+                    'address_id' => $srjalan->alamat_id,
+                    'address_reseller_id' => $srjalan->alamat_reseller_id,
+                    'address_expedition_id' => $srjalan->alamat_ekspedisi_id,
+                    'address_transit_id' => $srjalan->alamat_transit_id,
+                    'contact_number_id' => $srjalan->kontak_id,
+                    'contact_number_reseller_id' => $srjalan->kontak_reseller_id,
+                    'contact_number_expedition_id' => $srjalan->kontak_ekspedisi_id,
+                ]);
+                $alamat_ekspedisi_id = $srjalan->alamat_ekspedisi_id;
+                $alamat = DB::connection('mysql_old')->table('addresses')->where('id', $alamat_ekspedisi_id)->first();
+                DeliveryNoteExpedition::create([
+                    'delivery_id' => $srjalan->id,
+                    'expedition_id' => $srjalan->ekspedisi_id,
+                    'expedition_name' => $srjalan->ekspedisi_nama,
+                    'address_id' => $srjalan->alamat_ekspedisi_id,
+                    'full_address' => $srjalan->alamat_ekspedisi_full,
+                    'short_address' => $srjalan->alamat_ekspedisi_short,
+                    'contact_number_id' => $srjalan->kontak_ekspedisi_id,
+                    'contact_number' => $srjalan->kontak_ekspedisi_nomor,
+                ]);
+            }
+        });
+                
+
+        // Work Order Invoices Delivery Notes
         DB::connection('mysql_old')->table('spk_notas')->orderBy('id')->chunk(500, function ($spk_notas) {
             foreach ($spk_notas as $spk_nota) {
                 $work_order = WorkOrder::find($spk_nota->spk_id);
@@ -259,7 +298,7 @@ class FixDataAfterFreshSeeding extends Command
                     continue; // Skip this invoice if the work order does not exist
                 }
                 try {
-                    WorkOrderInvoice::create([
+                    WorkOrderInvoiceDeliveryNote::create([
                         'id' => $spk_nota->id,
                         'wo_id' => $spk_nota->spk_id,
                         'invoice_id' => $spk_nota->nota_id,
@@ -284,7 +323,7 @@ class FixDataAfterFreshSeeding extends Command
                 if ($spk_produk_nota->pelanggan_id) {
                     $pelanggan = DB::connection('mysql_old')->table('pelanggans')->where('id', $spk_produk_nota->pelanggan_id)->first();
                     if ($pelanggan) {
-                        $customer = Customer::where('customer_name', $pelanggan->nama)->first();
+                        $customer = Customer::where('name', $pelanggan->nama)->first();
                         if ($customer) {
                             $customer_id = $customer->id;
                             $customer_name = $customer->name;
@@ -301,11 +340,10 @@ class FixDataAfterFreshSeeding extends Command
                         'customer_id' => $customer_id,
                         'customer_name' => $customer_name,
                         'amount' => $spk_produk_nota->jumlah,
-                        'product_price_id' => $spk_produk_nota->harga_id,
-                        'product_name' => $spk_produk_nota->nama_produk,
+                        'product_price_id' => $spk_produk_nota->produk_harga_id,
                         'product_invoice_name' => $spk_produk_nota->nama_nota,
-                        'unit_price' => $spk_produk_nota->harga_satuan,
-                        'total_price' => $spk_produk_nota->harga_total,
+                        'unit_price' => $spk_produk_nota->harga,
+                        'total_price' => $spk_produk_nota->harga_t,
                         'created_at' => $spk_produk_nota->created_at,
                         'updated_at' => $spk_produk_nota->updated_at,
                     ]);

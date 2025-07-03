@@ -17,7 +17,7 @@ return new class extends Migration
         if (!Schema::hasTable('invoices')) {
             Schema::create('invoices', function (Blueprint $table) {
                 $table->id();
-                $table->string('invoice_number', 20)->nullable();
+                $table->string('invoice_number')->nullable()->unique();
                 // Data Customer
                 $table->foreignId('customer_id')->nullable()->constrained()->onDelete('SET NULL');
                 $table->foreignId('customer_address_id')->nullable()->constrained('addresses')->onDelete('SET NULL');

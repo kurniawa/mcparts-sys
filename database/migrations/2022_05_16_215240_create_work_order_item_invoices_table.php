@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('product_invoice_name')->nullable();
             $table->decimal('unit_price', 15, 2);
             $table->decimal('total_price', 15, 2);
+            $table->string('description')->nullable();
             $table->timestamps();
         });
     }
