@@ -258,23 +258,75 @@ class FixDataAfterFreshSeeding extends Command
         // Ambil semua data srjalans dari database lama
         DB::connection('mysql_old')->table('srjalans')->orderBy('id')->chunk(500, function ($srjalans) {
             foreach ($srjalans as $srjalan) {
+                // Data Customer
+                $customer_full_address = str_replace('\/', '-', str_replace('"', "'", $srjalan->cust_long));
+                $address_id = null;
+                $address = Address::where('full', $customer_full_address)->first();
+                if ($address) {
+                    $address_id = $address->id;
+                }
+
+                $customer_contact_number_id = null;
+                $customer_contact_number = null;
+                if ($srjalan->cust_kontak) {
+                    $cust_kontak = json_decode($srjalan->cust_kontak, true);
+                    $customer_contact_number = $cust_kontak['nomor'];
+                    if (isset($cust_kontak['kodearea'])) {
+                        $customer_contact_number = $cust_kontak['kodearea'] . '-' . $cust_kontak['nomor'];
+                    }
+                    $contact_number = ContactNumber::where('owner_type', 'customer')
+                        ->where('owner_name', $srjalan->pelanggan_nama)
+                        ->where('number', json_decode($srjalan->cust_kontak, true)['nomor'])
+                        ->first();
+                    if ($contact_number) {
+                        $customer_contact_number_id = $contact_number->id;
+                    }
+                }
+
+                // Data Reseller
+                $reseller_full_address = str_replace('\/', '-', str_replace('"', "'", $srjalan->cust_long));
+                $address_id = null;
+                $address = Address::where('full', $reseller_full_address)->first();
+                if ($address) {
+                    $address_id = $address->id;
+                }
+
+                $reseller_contact_number_id = null;
+                $reseller_contact_number = null;
+                if ($srjalan->cust_kontak) {
+                    $reseller_kontak = json_decode($srjalan->reseller_kontak, true);
+                    $reseller_contact_number = $reseller_kontak['nomor'];
+                    if (isset($reseller_kontak['kodearea'])) {
+                        $reseller_contact_number = $reseller_kontak['kodearea'] . '-' . $reseller_kontak['nomor'];
+                    }
+                    $contact_number = ContactNumber::where('owner_type', 'customer')
+                        ->where('owner_name', $srjalan->pelanggan_nama)
+                        ->where('number', json_decode($srjalan->reseller_kontak, true)['nomor'])
+                        ->first();
+                    if ($contact_number) {
+                        $reseller_contact_number_id = $contact_number->id;
+                    }
+                }
                 DeliveryNote::create([
                     'id' => $srjalan->id,
                     'delivery_note_number' => $srjalan->no_srjalan,
                     'customer_id' => $srjalan->pelanggan_id,
-                    'expedition_id' => $srjalan->ekspedisi_id,
-                    'expedition_transit_id' => $srjalan->ekspedisi_transit_id,
+                    'customer_name' => $srjalan->pelanggan_nama,
+                    'listed_name' => $srjalan->nama_tertera,
+                    'customer_address_id' => $address_id,
+                    'customer_full_address' => $customer_full_address,
+                    'customer_short_address' => $srjalan->cust_short,
+                    'customer_contact_number_id' => $customer_contact_number_id,
+                    'customer_contact_number' => $customer_contact_number,
+
                     'reseller_id' => $srjalan->reseller_id,
-                    'address_id' => $srjalan->alamat_id,
-                    'address_reseller_id' => $srjalan->alamat_reseller_id,
-                    'address_expedition_id' => $srjalan->alamat_ekspedisi_id,
-                    'address_transit_id' => $srjalan->alamat_transit_id,
-                    'contact_number_id' => $srjalan->kontak_id,
-                    'contact_number_reseller_id' => $srjalan->kontak_reseller_id,
-                    'contact_number_expedition_id' => $srjalan->kontak_ekspedisi_id,
+                    'reseller_name' => $srjalan->reseller_nama,
+                    'reseller_address_id' => $srjalan->alamat_reseller_id,
+                    'reseller_full_address' => $reseller_full_address,
+                    'reseller_short_address' => $srjalan->reseller_short,
+                    'reseller_contact_number_id' => $reseller_contact_number_id,
+                    'reseller_contact_number' => $reseller_contact_number,
                 ]);
-                $alamat_ekspedisi_id = $srjalan->alamat_ekspedisi_id;
-                $alamat = DB::connection('mysql_old')->table('addresses')->where('id', $alamat_ekspedisi_id)->first();
                 DeliveryNoteExpedition::create([
                     'delivery_id' => $srjalan->id,
                     'expedition_id' => $srjalan->ekspedisi_id,
