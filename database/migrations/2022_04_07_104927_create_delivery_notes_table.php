@@ -18,16 +18,17 @@ return new class extends Migration
             $table->id();
             $table->string('delivery_number')->nullable()->unique();
             // Customer Information
+            $table->string('alias',100)->nullable();
             $table->foreignId('customer_id')->nullable()->constrained()->onDelete('SET NULL');
             $table->string('customer_name',100)->nullable();
-            $table->foreignId('customer_address_id')->nullable()->constrained()->onDelete('SET NULL'); // penting kalo sewaktu-waktu alamat utama pelanggan di edit.
+            $table->foreignId('customer_address_id')->nullable()->constrained('addresses')->onDelete('SET NULL'); // penting kalo sewaktu-waktu alamat utama pelanggan di edit.
             $table->string('customer_full_address')->nullable();
             $table->string('customer_short_address')->nullable();
             $table->foreignId('customer_contact_number_id')->nullable()->constrained('contact_numbers')->onDelete('SET NULL');
             $table->string('customer_contact_number')->nullable();
             // Reseller Information
             $table->foreignId('reseller_id')->nullable()->constrained('customers')->onDelete('set null');
-            $table->string('reseller_nama',100)->nullable();
+            $table->string('reseller_name',100)->nullable();
             $table->foreignId('reseller_address_id')->nullable()->constrained('addresses')->onDelete('SET NULL'); // penting kalo sewaktu-waktu alamat utama pelanggan di edit.
             $table->string('reseller_full_address')->nullable();
             $table->string('reseller_short_address')->nullable();
