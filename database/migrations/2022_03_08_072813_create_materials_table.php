@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('slug')->nullable()->unique();
             $table->foreignId('supplier_id')->nullable();
             $table->string('supplier_name', 50)->nullable();
-            $table->string('name_from_supplier')->nullable();
+            $table->string('supplier_item_name')->nullable();
+            $table->string('supplier_item_code', 50)->nullable();
             $table->enum('grade', ['A','B'])->nullable(); // ada grade A dan B
             $table->decimal('thickness', 2, 1)->nullable(); // Ketebalan dalam mm
             $table->string('texture', 50)->nullable(); // misalnya: motif urat tangan
@@ -27,6 +28,8 @@ return new class extends Migration
             $table->string('backing_color', 50)->nullable();
             $table->string('stamp', 50)->nullable(); // merek yang tercantum, misalnya: "MC"
             $table->decimal('default_price', 15, 2)->default(0.00); // Harga per meter
+            $table->string('image_path')->nullable();
+            $table->string('image_url')->nullable(); // URL to the product type photo.
             $table->string('description', 1000)->nullable();
 
             $table->string('created_by', 50)->nullable();

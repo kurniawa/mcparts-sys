@@ -58,8 +58,10 @@ class SeedingWorkOrders extends Command
                         'customer_short_address' => $spk->cust_short,
                         'reseller_name' => $spk->reseller_nama,
                         'reseller_short_address' => $spk->reseller_short,
+
                         'created_by' => $spk->created_by,
                         'updated_by' => $spk->updated_by,
+                        'issued_at' => $spk->created_at,
                         'finished_at' => $spk->finished_at,
                         'created_at' => $spk->created_at,
                         'updated_at' => $spk->updated_at,

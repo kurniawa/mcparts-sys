@@ -32,6 +32,8 @@ return new class extends Migration
             $table->string('invoice_name');
             $table->string('packaging_type', 20)->nullable();
             $table->smallInteger('packaging_rule')->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('image_url')->nullable(); // URL to the product type photo.
             $table->string('description')->nullable();
 
             $table->string('created_by', 50)->nullable();

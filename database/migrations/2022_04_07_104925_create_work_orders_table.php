@@ -42,6 +42,7 @@ return new class extends Migration
             $table->timestamp('deleted_at')->nullable(); // Soft delete
             $table->string('deleted_by', 50)->nullable(); // User who deleted the record, if applicable
             $table->string('deleted_reason', 255)->nullable(); // Reason for deletion, if applicable
+            $table->timestamp('issued_at')->nullable();
             $table->timestamp('finished_at')->nullable();
             $table->timestamps();
         });

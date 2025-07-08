@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('spk_name', 50)->nullable();
             $table->string('invoice_name', 50)->nullable();
             $table->string('default_price', 50)->nullable();
-            $table->string('photo_path')->nullable(); // Path to the product type photo.
-            $table->string('photo_url')->nullable(); // URL to the product type photo.
+            $table->string('image_path')->nullable(); // Path to the product type photo.
+            $table->string('image_url')->nullable(); // URL to the product type photo.
             $table->string('description')->nullable();
 
             $table->string('created_by', 50)->nullable();

@@ -140,6 +140,7 @@ class SeedingInvoices extends Command
                         // 'deleted_at' => $nota->deleted_at,
                         // 'deleted_by' => $nota->deleted_by,
                         // 'deleted_reason' => $nota->deleted_reason,
+                        'issued_at' => $nota->created_at,
                         'finished_at' => $nota->finished_at,
                         'created_at' => $nota->created_at,
                         'updated_at' => $nota->updated_at,

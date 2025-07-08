@@ -82,7 +82,7 @@ class SeedingDeliveryNotes extends Command
                         $reseller_contact_number_string = $reseller_kontak['kodearea'] . '-' . $reseller_kontak['nomor'];
                     }
                     $contact_number = ContactNumber::where('owner_type', 'customer')
-                        ->where('owner_name', $srjalan->pelanggan_nama)
+                        ->where('owner_name', $srjalan->reseller_nama)
                         ->where('number', json_decode($srjalan->reseller_kontak, true)['nomor'])
                         ->first();
                     if ($contact_number) {
@@ -111,6 +111,9 @@ class SeedingDeliveryNotes extends Command
 
                     'created_by' => $srjalan->created_by,
                     'updated_by' => $srjalan->updated_by,
+                    'issued_at' => $srjalan->created_at,
+                    'created_at' => $srjalan->created_at,
+                    'updated_at' => $srjalan->updated_at,
                 ]);
 
                 // Data Expedition
@@ -131,7 +134,7 @@ class SeedingDeliveryNotes extends Command
                         $expedition_contact_number_string = $expedition_kontak['kodearea'] . '-' . $expedition_kontak['nomor'];
                     }
                     $expedition_contact_number = ContactNumber::where('owner_type', 'expedition')
-                        ->where('owner_name', $srjalan->pelanggan_nama)
+                        ->where('owner_name', $srjalan->ekspedisi_nama)
                         ->where('number', json_decode($srjalan->ekspedisi_kontak, true)['nomor'])
                         ->first();
                     if ($expedition_contact_number) {
@@ -169,7 +172,7 @@ class SeedingDeliveryNotes extends Command
                             $transit_contact_number_string = $transit_kontak['kodearea'] . '-' . $transit_kontak['nomor'];
                         }
                         $transit_contact_number = ContactNumber::where('owner_type', 'expedition')
-                            ->where('owner_name', $srjalan->pelanggan_nama)
+                            ->where('owner_name', $srjalan->transit_nama)
                             ->where('number', json_decode($srjalan->transit_kontak, true)['nomor'])
                             ->first();
                         if ($transit_contact_number) {
