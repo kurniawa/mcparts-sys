@@ -26,7 +26,7 @@ return new class extends Migration
             $table->smallInteger('completed_amount')->nullable();
             $table->smallInteger('amount_on_invoice')->nullable();
             $table->smallInteger('amount_on_delivery_note')->nullable();
-            $table->decimal('basic_price', 15, 2)->nullable(); // Harga dasar produk, bisa diambil dari tabel product_prices
+            $table->decimal('initial_price', 15, 2)->nullable(); // Harga dasar produk, bisa diambil dari tabel product_prices
             $table->decimal('actual_price', 15, 2)->nullable();
             $table->smallinteger('discount_value')->nullable();
             $table->decimal('discounted_price', 15, 2)->nullable();

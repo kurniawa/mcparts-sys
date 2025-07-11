@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('supplier_name', 100)->nullable();
             $table->string('customer_name', 100)->nullable();
             $table->string('reseller_name', 100)->nullable();
-            $table->decimal('basic_price', 15, 2);
+            $table->decimal('initial_price', 15, 2);
             // $table->decimal('customer_price', 15, 2)->nullable(); // Harga khusus untuk customer tertentu.
             $table->smallinteger('discount_value')->nullable(); // in percentage
             $table->decimal('final_price', 15, 2)->nullable();

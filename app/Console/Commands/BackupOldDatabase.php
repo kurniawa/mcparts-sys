@@ -434,12 +434,18 @@ class BackupOldDatabase extends Command
         $data = DB::connection('mysql_old')->table('produk_hargas')->get()->map(function ($item) {
             $item = json_decode(json_encode($item), true); // Ubah object menjadi array
             $item['product_id'] = $item['produk_id']; // Buat kolom baru
-            $item['basic_price'] = $item['harga'];
+            $item['initial_price'] = $item['harga'];
             $price_order = 'secondary';
             if ($item['status'] === 'BARU') {
                 $price_order = 'primary';
             }
             $item['price_order'] = $price_order;
+
+            // product_name and product_invoice_name
+            $produk = DB::connection('mysql_old')->table('produks')->find($item['produk_id']);
+            
+            $item['product_name'] = $produk->nama;
+            $item['product_invoice_name'] = $produk->nama_nota;
 
             // Hapus kolom lama
             $item = Arr::except($item, [
