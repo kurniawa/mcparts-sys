@@ -31,6 +31,7 @@ class SeedingFromPreviousDatabase extends Command
         $this->call('app:seeding-work-orders');
         $this->call('app:seeding-invoices');
         $this->call('app:seeding-delivery-notes');
+        $this->call('app:seeding-wallets');
 
         $this->info('Data telah diperbaiki dan migrasi SPK selesai.');
     }

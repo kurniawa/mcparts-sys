@@ -21,7 +21,7 @@ return new class extends Migration
             $table->enum('type', ['income', 'expenses']);
             $table->string('transaction_method', 20)->nullable(); // bank transfer
             $table->string('transaction_type', 20)->nullable(); // tunai, non-tunai
-            $table->string('wallet_type', 20)->nullable(); // tunai, bank, e-wallet
+            $table->string('wallet_category_slug', 20)->nullable(); // tunai, bank, e-wallet
             $table->string('wallet_name', 20)->nullable(); // tunai, bca, bri, bni, mandiri, ovo, gopay, dana, dll.
             $table->decimal('amount', 15, 2); // maks 999 Triliun
             $table->decimal('initial_balance', 15, 2)->default(0);
